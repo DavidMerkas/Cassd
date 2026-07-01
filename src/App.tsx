@@ -325,7 +325,7 @@ export default function App() {
 
         {/* toast */}
         {toast && (
-          <div style={{ position: 'absolute', left: '50%', bottom: 314, transform: 'translateX(-50%)', zIndex: 90, background: '#16140F', color: '#F5F1E8', fontWeight: 800, fontSize: 13, padding: '11px 18px', borderRadius: 999, boxShadow: '0 8px 20px rgba(0,0,0,0.35)', whiteSpace: 'nowrap', animation: 'cassd-rise .25s ease', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ position: 'absolute', left: '50%', bottom: 320, transform: 'translateX(-50%)', zIndex: 90, background: '#16140F', color: '#F5F1E8', fontWeight: 800, fontSize: 13, padding: '11px 18px', borderRadius: 999, boxShadow: '0 8px 20px rgba(0,0,0,0.35)', whiteSpace: 'nowrap', animation: 'cassd-rise .25s ease', display: 'flex', alignItems: 'center', gap: 8 }}>
             {toast}
           </div>
         )}
@@ -355,13 +355,14 @@ export default function App() {
           cassetteStyle={cassetteStyle}
           elapsed={elapsed}
           overSlot={overSlot}
+          dragging={!!drag && !drag.pull}
           startPull={startPull}
           openEject={openEject}
         />
 
         {/* drag ghost */}
         {drag && dragTask && (
-          <div style={{ position: 'absolute', left: dragPos.x, top: dragPos.y, zIndex: 80, transform: 'translate(-50%, -50%) rotate(-6deg)', pointerEvents: 'none', filter: 'drop-shadow(0 14px 20px rgba(0,0,0,0.4))' } as CSSProperties}>
+          <div style={{ position: 'absolute', left: dragPos.x, top: dragPos.y, zIndex: 80, transform: `translate(-50%, -50%) rotate(${overSlot ? '-1deg' : '-6deg'}) scale(${overSlot ? 0.92 : 1})`, transition: 'transform .16s ease', pointerEvents: 'none', filter: 'drop-shadow(0 14px 20px rgba(0,0,0,0.4))' } as CSSProperties}>
             <Cassette title={dragTask.name} color={dragTask.color} group={dragTask.group} state="shelf" cstyle={cassetteStyle} habit={dragTask.habit} w={150} />
           </div>
         )}

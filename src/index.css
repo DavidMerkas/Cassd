@@ -12,6 +12,19 @@ input { font-family: inherit; }
 @keyframes cassd-coin { 0% { transform: translateY(0) scale(1); } 40% { transform: translateY(-8px) scale(1.25); } 100% { transform: translateY(0) scale(1); } }
 @keyframes cassd-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+/* tape drops into the slot mouth, pushes a touch too deep, then springs back seated */
+@keyframes cassd-dock {
+  0% { transform: translateY(-74px); }
+  62% { transform: translateY(7px); }
+  82% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+@keyframes cassd-slot-pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
+@keyframes cassd-sink {
+  0%, 100% { transform: translate(-50%, 0); opacity: 0.4; }
+  50% { transform: translate(-50%, 5px); opacity: 0.8; }
+}
+
 .cassd-scroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .cassd-scroll { scrollbar-width: none; }
 
@@ -25,3 +38,11 @@ input { font-family: inherit; }
   transition: transform .09s ease, box-shadow .09s ease;
 }
 .press:active { transform: translateY(3px); box-shadow: var(--sh-a); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
