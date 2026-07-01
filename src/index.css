@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #d8d3c7; }
+button { font-family: inherit; }
+input { font-family: inherit; }
+
+@keyframes cassd-eq { 0%, 100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
+@keyframes cassd-pop { 0% { transform: scale(.85); opacity: 0; } 60% { transform: scale(1.03); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes cassd-glow { 0%, 100% { opacity: .45; } 50% { opacity: .85; } }
+@keyframes cassd-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes cassd-scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(400%); } }
+@keyframes cassd-rise { 0% { transform: translateY(14px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes cassd-coin { 0% { transform: translateY(0) scale(1); } 40% { transform: translateY(-8px) scale(1.25); } 100% { transform: translateY(0) scale(1); } }
+@keyframes cassd-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.cassd-scroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.cassd-scroll { scrollbar-width: none; }
+
+/* shelf tape lift on hover */
+.tape-hover { transition: transform .16s ease; }
+.tape-hover:hover { transform: translateY(-11px); }
+
+/* chunky press-down buttons; each button sets --sh (rest) and --sh-a (pressed) */
+.press {
+  box-shadow: var(--sh);
+  transition: transform .09s ease, box-shadow .09s ease;
+}
+.press:active { transform: translateY(3px); box-shadow: var(--sh-a); }
