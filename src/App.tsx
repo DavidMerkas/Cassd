@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import type { Screen, Task, Category, DragState, CassetteStyle } from './types'
 import { GROUPS, BB_SKINS, CLOSET_SKINS, VALUE_PER } from './skins'
 import { load, save } from './storage'
@@ -12,35 +12,6 @@ import Boombox from './components/Boombox'
 import EjectOverlay from './components/EjectOverlay'
 
 const initial = load()
-
-function NavButton({ active, label, onClick, children, badge }: {
-  active: boolean
-  label: string
-  onClick: () => void
-  children: ReactNode
-  badge?: number
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        flex: 1, position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-        border: 'none', background: active ? '#16140F' : 'transparent',
-        borderRadius: 12, padding: '8px 0 6px', cursor: 'pointer',
-        color: active ? '#F5F1E8' : 'rgba(22,20,15,0.4)',
-        transition: 'background .16s ease',
-      }}
-    >
-      {children}
-      <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: '0.03em' }}>{label}</span>
-      {badge != null && badge > 0 && (
-        <span style={{ position: 'absolute', top: 4, right: 'calc(50% - 22px)', minWidth: 16, height: 16, padding: '0 4px', borderRadius: 999, background: '#FF5C28', border: '1.5px solid #16140F', color: '#16140F', fontFamily: 'Anton, sans-serif', fontSize: 9.5, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {badge}
-        </span>
-      )}
-    </button>
-  )
-}
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>(initial.tasks)
@@ -325,28 +296,12 @@ export default function App() {
 
         {/* toast */}
         {toast && (
-          <div style={{ position: 'absolute', left: '50%', bottom: 320, transform: 'translateX(-50%)', zIndex: 90, background: '#16140F', color: '#F5F1E8', fontWeight: 800, fontSize: 13, padding: '11px 18px', borderRadius: 999, boxShadow: '0 8px 20px rgba(0,0,0,0.35)', whiteSpace: 'nowrap', animation: 'cassd-rise .25s ease', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ position: 'absolute', left: '50%', bottom: 340, transform: 'translateX(-50%)', zIndex: 90, background: '#16140F', color: '#F5F1E8', fontWeight: 800, fontSize: 13, padding: '11px 18px', borderRadius: 999, boxShadow: '0 8px 20px rgba(0,0,0,0.35)', whiteSpace: 'nowrap', animation: 'cassd-rise .25s ease', display: 'flex', alignItems: 'center', gap: 8 }}>
             {toast}
           </div>
         )}
 
-        {/* nav bar */}
-        <div style={{ flex: 'none', background: '#ECE5D6', borderTop: '2px solid rgba(22,20,15,0.1)', padding: '7px 10px 8px', display: 'flex', gap: 6 }}>
-          <NavButton active={screen === 'closet'} label="CLOSET" onClick={() => go('closet')}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5" /><line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" /><line x1="9" y1="5.5" x2="9" y2="6.5" /></svg>
-          </NavButton>
-          <NavButton active={screen === 'studio'} label="STUDIO" onClick={() => go('studio')}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20l4.5-1.2L19 8.3l-3.3-3.3L5.2 15.5 4 20z" /><path d="M13.5 6.5l3.3 3.3" /></svg>
-          </NavButton>
-          <NavButton active={screen === 'crate'} label="CRATE" onClick={() => go('crate')} badge={crateItems.length}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8h17l-1 12.5H4.5z" /><path d="M3.5 8l2.2-4h12.6L20.5 8" /><line x1="12" y1="8" x2="12" y2="20.5" /></svg>
-          </NavButton>
-          <NavButton active={screen === 'shop'} label="SHOP" onClick={() => go('shop')}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 8h14l-1.2 12.5H6.2z" /><path d="M8.5 8a3.5 3.5 0 0 1 7 0" /></svg>
-          </NavButton>
-        </div>
-
-        {/* boombox dock */}
+        {/* boombox dock — nav lives on the deck keys */}
         <Boombox
           dockRef={dockRef}
           bb={bb}
@@ -356,6 +311,9 @@ export default function App() {
           elapsed={elapsed}
           overSlot={overSlot}
           dragging={!!drag && !drag.pull}
+          screen={screen}
+          crateCount={crateItems.length}
+          go={go}
           startPull={startPull}
           openEject={openEject}
         />

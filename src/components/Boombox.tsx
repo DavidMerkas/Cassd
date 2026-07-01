@@ -1,5 +1,5 @@
-import type { CSSProperties, PointerEvent, Ref } from 'react'
-import type { Task, CassetteStyle } from '../types'
+import type { CSSProperties, PointerEvent, ReactNode, Ref } from 'react'
+import type { Task, CassetteStyle, Screen } from '../types'
 import type { BoomboxSkin } from '../skins'
 import { fmt } from '../util'
 import Cassette from './Cassette'
@@ -13,8 +13,51 @@ interface Props {
   elapsed: number
   overSlot: boolean
   dragging: boolean
+  screen: Screen
+  crateCount: number
+  go: (s: Screen) => void
   startPull: (e: PointerEvent) => void
   openEject: () => void
+}
+
+/* mechanical deck key — the active one sits physically pressed in, LED lit */
+function DeckKey({ active, label, onClick, badge, children }: {
+  active: boolean
+  label: string
+  onClick: () => void
+  badge?: number
+  children: ReactNode
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="press"
+      aria-pressed={active}
+      style={{
+        flex: 1, position: 'relative',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+        padding: '8px 0 6px',
+        border: '2.5px solid #0D0C09', borderRadius: 8, cursor: 'pointer',
+        background: active ? 'linear-gradient(180deg,#26221b,#332f27)' : 'linear-gradient(180deg,#4a453b,#332f27)',
+        color: active ? '#FFD23F' : 'rgba(245,241,232,0.55)',
+        transform: active ? 'translateY(3px)' : undefined,
+        transition: 'color .15s ease, background .15s ease',
+        '--sh': active
+          ? '0 1px 0 #0D0C09, inset 0 2px 4px rgba(0,0,0,0.55)'
+          : '0 4px 0 #0D0C09, inset 0 1px 0 rgba(255,255,255,0.12)',
+        '--sh-a': '0 1px 0 #0D0C09, inset 0 2px 4px rgba(0,0,0,0.55)',
+      } as CSSProperties}
+    >
+      <span style={{ position: 'absolute', top: 4, right: 6, width: 5, height: 5, borderRadius: '50%', background: active ? '#7CFF5A' : '#231f19', boxShadow: active ? '0 0 6px rgba(124,255,90,0.9)' : 'inset 0 1px 1px rgba(0,0,0,0.7)', transition: 'background .15s ease, box-shadow .15s ease' }} />
+      {children}
+      <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.06em' }}>{label}</span>
+      {badge != null && badge > 0 && (
+        <span style={{ position: 'absolute', top: -8, left: '50%', transform: 'translateX(10px)', minWidth: 16, height: 16, padding: '0 4px', borderRadius: 999, background: '#FF5C28', border: '1.5px solid #0D0C09', color: '#16140F', fontFamily: 'Anton, sans-serif', fontSize: 9.5, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+          {badge}
+        </span>
+      )}
+    </button>
+  )
 }
 
 /* deck geometry: the cassette is designed 228×142 and rendered at 196 wide */
@@ -49,7 +92,7 @@ const eqBar = (color: string, dur: string, delay: string): CSSProperties => ({
 
 export default function Boombox({
   dockRef, bb, playing, showDockedCassette, cassetteStyle,
-  elapsed, overSlot, dragging, startPull, openEject,
+  elapsed, overSlot, dragging, screen, crateCount, go, startPull, openEject,
 }: Props) {
   const dropReady = dragging && !playing
   return (
@@ -135,7 +178,7 @@ export default function Boombox({
         </div>
 
         {/* main row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '12px 13px 12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 11, padding: '12px 13px 6px' }}>
           <Speaker bb={bb} />
 
           {/* center: LCD screen + eject */}
@@ -145,15 +188,15 @@ export default function Boombox({
               <div style={{ position: 'absolute', left: 0, right: 0, height: 22, background: 'linear-gradient(180deg, rgba(255,255,255,0.09), transparent)', animation: 'cassd-scan 4.5s linear infinite', pointerEvents: 'none' }} />
 
               {playing ? (
-                <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '8px 11px', gap: 5 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '6px 11px', gap: 3 }}>
+                  <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <span style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 8, letterSpacing: '0.14em', color: '#7CFF5A', opacity: 0.85 }}>▶ SIDE A</span>
                     <span style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 8, letterSpacing: '0.1em', color: '#FFC24B' }}>{playing.group}</span>
                   </div>
-                  <div style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 12.5, color: '#86F06B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 0 6px rgba(124,255,90,0.5)' }}>
+                  <div style={{ flex: 'none', fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 12.5, lineHeight: 1.25, color: '#86F06B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 0 6px rgba(124,255,90,0.5)' }}>
                     {playing.name}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                  <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 12 }}>
                       <span style={eqBar('#7CFF5A', '0.8s', '0s')} />
                       <span style={eqBar('#FFC24B', '0.66s', '.15s')} />
@@ -201,6 +244,22 @@ export default function Boombox({
           </div>
 
           <Speaker bb={bb} />
+        </div>
+
+        {/* deck keys: screen switching lives on the boombox like a tape-deck key row */}
+        <div style={{ display: 'flex', gap: 7, padding: '2px 13px 12px' }}>
+          <DeckKey active={screen === 'closet'} label="CLOSET" onClick={() => go('closet')}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5" /><line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" /><line x1="9" y1="5.5" x2="9" y2="6.5" /></svg>
+          </DeckKey>
+          <DeckKey active={screen === 'studio'} label="STUDIO" onClick={() => go('studio')}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20l4.5-1.2L19 8.3l-3.3-3.3L5.2 15.5 4 20z" /><path d="M13.5 6.5l3.3 3.3" /></svg>
+          </DeckKey>
+          <DeckKey active={screen === 'crate'} label="CRATE" onClick={() => go('crate')} badge={crateCount}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8h17l-1 12.5H4.5z" /><path d="M3.5 8l2.2-4h12.6L20.5 8" /><line x1="12" y1="8" x2="12" y2="20.5" /></svg>
+          </DeckKey>
+          <DeckKey active={screen === 'shop'} label="SHOP" onClick={() => go('shop')}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 8h14l-1.2 12.5H6.2z" /><path d="M8.5 8a3.5 3.5 0 0 1 7 0" /></svg>
+          </DeckKey>
         </div>
 
         {/* base strip */}
