@@ -1,4 +1,4 @@
-import type { CSSProperties, PointerEvent, ReactNode, Ref } from 'react'
+import type { CSSProperties, PointerEvent, Ref } from 'react'
 import type { Task, CassetteStyle, Screen } from '../types'
 import type { BoomboxSkin } from '../skins'
 import { fmt } from '../util'
@@ -20,42 +20,26 @@ interface Props {
   openEject: () => void
 }
 
-/* mechanical deck key — the active one sits physically pressed in, LED lit */
-function DeckKey({ active, label, onClick, badge, children }: {
-  active: boolean
-  label: string
-  onClick: () => void
-  badge?: number
-  children: ReactNode
-}) {
+/* screens cycled by the deck's tab dial */
+const ORDER: Screen[] = ['closet', 'studio', 'crate', 'shop']
+
+function ArrowKey({ dir, onClick }: { dir: -1 | 1; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
       className="press"
-      aria-pressed={active}
+      aria-label={dir < 0 ? 'previous screen' : 'next screen'}
       style={{
-        flex: 1, position: 'relative',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
-        padding: '8px 0 6px',
+        flex: 'none', width: 48, display: 'flex', alignItems: 'center', justifyContent: 'center',
         border: '2.5px solid #0D0C09', borderRadius: 8, cursor: 'pointer',
-        background: active ? 'linear-gradient(180deg,#26221b,#332f27)' : 'linear-gradient(180deg,#4a453b,#332f27)',
-        color: active ? '#FFD23F' : 'rgba(245,241,232,0.55)',
-        transform: active ? 'translateY(3px)' : undefined,
-        transition: 'color .15s ease, background .15s ease',
-        '--sh': active
-          ? '0 1px 0 #0D0C09, inset 0 2px 4px rgba(0,0,0,0.55)'
-          : '0 4px 0 #0D0C09, inset 0 1px 0 rgba(255,255,255,0.12)',
-        '--sh-a': '0 1px 0 #0D0C09, inset 0 2px 4px rgba(0,0,0,0.55)',
+        background: 'linear-gradient(180deg,#4a453b,#332f27)', color: '#F5F1E8',
+        '--sh': '0 4px 0 #0D0C09, inset 0 1px 0 rgba(255,255,255,0.12)',
+        '--sh-a': '0 1px 0 #0D0C09, inset 0 2px 4px rgba(0,0,0,0.5)',
       } as CSSProperties}
     >
-      <span style={{ position: 'absolute', top: 4, right: 6, width: 5, height: 5, borderRadius: '50%', background: active ? '#7CFF5A' : '#231f19', boxShadow: active ? '0 0 6px rgba(124,255,90,0.9)' : 'inset 0 1px 1px rgba(0,0,0,0.7)', transition: 'background .15s ease, box-shadow .15s ease' }} />
-      {children}
-      <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.06em' }}>{label}</span>
-      {badge != null && badge > 0 && (
-        <span style={{ position: 'absolute', top: -8, left: '50%', transform: 'translateX(10px)', minWidth: 16, height: 16, padding: '0 4px', borderRadius: 999, background: '#FF5C28', border: '1.5px solid #0D0C09', color: '#16140F', fontFamily: 'Anton, sans-serif', fontSize: 9.5, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
-          {badge}
-        </span>
-      )}
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+        {dir < 0 ? <path d="M15 18l-6-6 6-6" /> : <path d="M9 6l6 6-6 6" />}
+      </svg>
     </button>
   )
 }
@@ -96,7 +80,7 @@ export default function Boombox({
 }: Props) {
   const dropReady = dragging && !playing
   return (
-    <div ref={dockRef} style={{ flex: 'none', position: 'relative', background: '#16140F', borderTop: '3px solid #0D0C09', padding: '6px 16px 16px', overflow: 'visible' }}>
+    <div ref={dockRef} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 10, background: 'linear-gradient(180deg, rgba(236,229,214,0) 0%, rgba(236,229,214,0.92) 58px, #ECE5D6 96px)', padding: '6px 16px 16px', overflow: 'visible' }}>
       {/* slot zone — fixed height whether or not a tape is docked */}
       <div style={{ position: 'relative', height: ZONE_H }}>
         {/* drop target while dragging a tape from the closet */}
@@ -105,8 +89,8 @@ export default function Boombox({
             style={{
               position: 'absolute', left: '50%', bottom: 4, transform: 'translateX(-50%)',
               width: SLOT_W - 8, height: 52, borderRadius: 10, pointerEvents: 'none',
-              border: `2.5px dashed ${overSlot ? '#FFC24B' : 'rgba(245,241,232,0.35)'}`,
-              background: overSlot ? 'rgba(255,194,75,0.08)' : 'transparent',
+              border: `2.5px dashed ${overSlot ? '#FF5C28' : 'rgba(22,20,15,0.35)'}`,
+              background: overSlot ? 'rgba(255,92,40,0.08)' : 'transparent',
               transition: 'border-color .15s ease, background .15s ease',
               animation: overSlot ? 'none' : 'cassd-slot-pulse 1.6s ease-in-out infinite',
             }}
@@ -115,7 +99,7 @@ export default function Boombox({
 
         {/* idle hint pointing at the open mouth */}
         {!playing && !dragging && (
-          <div style={{ position: 'absolute', left: '50%', bottom: 6, transform: 'translateX(-50%)', color: 'rgba(245,241,232,0.4)', fontSize: 15, lineHeight: 1, animation: 'cassd-sink 2.4s ease-in-out infinite', pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', left: '50%', bottom: 6, transform: 'translateX(-50%)', color: 'rgba(22,20,15,0.45)', fontSize: 15, lineHeight: 1, animation: 'cassd-sink 2.4s ease-in-out infinite', pointerEvents: 'none' }}>
             ⌄
           </div>
         )}
@@ -132,7 +116,7 @@ export default function Boombox({
                 animation: 'cassd-dock .34s cubic-bezier(.22,1,.36,1)',
               }}
             >
-              <div style={{ position: 'absolute', left: '50%', top: -22, transform: 'translateX(-50%)', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, color: 'rgba(245,241,232,0.6)', pointerEvents: 'none' }}>
+              <div style={{ position: 'absolute', left: '50%', top: -22, transform: 'translateX(-50%)', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, color: 'rgba(22,20,15,0.6)', pointerEvents: 'none' }}>
                 <span style={{ fontSize: 12, lineHeight: 1, animation: 'cassd-bob 1.8s ease-in-out infinite' }}>⌃</span>
                 <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>PULL TO EJECT</span>
               </div>
@@ -246,20 +230,20 @@ export default function Boombox({
           <Speaker bb={bb} />
         </div>
 
-        {/* deck keys: screen switching lives on the boombox like a tape-deck key row */}
-        <div style={{ display: 'flex', gap: 7, padding: '2px 13px 12px' }}>
-          <DeckKey active={screen === 'closet'} label="CLOSET" onClick={() => go('closet')}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5" /><line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" /><line x1="9" y1="5.5" x2="9" y2="6.5" /></svg>
-          </DeckKey>
-          <DeckKey active={screen === 'studio'} label="STUDIO" onClick={() => go('studio')}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20l4.5-1.2L19 8.3l-3.3-3.3L5.2 15.5 4 20z" /><path d="M13.5 6.5l3.3 3.3" /></svg>
-          </DeckKey>
-          <DeckKey active={screen === 'crate'} label="CRATE" onClick={() => go('crate')} badge={crateCount}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8h17l-1 12.5H4.5z" /><path d="M3.5 8l2.2-4h12.6L20.5 8" /><line x1="12" y1="8" x2="12" y2="20.5" /></svg>
-          </DeckKey>
-          <DeckKey active={screen === 'shop'} label="SHOP" onClick={() => go('shop')}>
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 8h14l-1.2 12.5H6.2z" /><path d="M8.5 8a3.5 3.5 0 0 1 7 0" /></svg>
-          </DeckKey>
+        {/* tab dial: mini LCD shows the open screen, arrows cycle through */}
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: 7, padding: '2px 13px 12px' }}>
+          <ArrowKey dir={-1} onClick={() => go(ORDER[(ORDER.indexOf(screen) + ORDER.length - 1) % ORDER.length])} />
+          <div style={{ flex: 1, position: 'relative', minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: bb.screen, border: '2.5px solid #0D0C09', borderRadius: 8, overflow: 'hidden', boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.12)' }}>
+            <span key={screen} style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 11.5, letterSpacing: '0.22em', color: '#7CFF5A', textShadow: '0 0 6px rgba(124,255,90,0.5)', animation: 'cassd-lcd-in .18s ease' }}>
+              {screen.toUpperCase()}
+            </span>
+            {crateCount > 0 && screen !== 'crate' && (
+              <span style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 9.5, color: '#FFC24B', textShadow: '0 0 5px rgba(255,194,75,0.55)' }}>
+                +{crateCount}
+              </span>
+            )}
+          </div>
+          <ArrowKey dir={1} onClick={() => go(ORDER[(ORDER.indexOf(screen) + 1) % ORDER.length])} />
         </div>
 
         {/* base strip */}

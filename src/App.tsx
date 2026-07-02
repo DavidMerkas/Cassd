@@ -260,7 +260,8 @@ export default function App() {
         </div>
 
         {/* content */}
-        <div className="cassd-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', position: 'relative' }}>
+        {/* content scrolls behind the boombox, which floats over it */}
+        <div className="cassd-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', position: 'relative', paddingBottom: 330 }}>
           {screen === 'closet' && (
             <Closet
               shelfTasks={shelfTasks}
