@@ -19,7 +19,7 @@ export interface BoomboxSkin {
 }
 
 export const BB_SKINS: Record<string, BoomboxSkin> = {
-  retro: { name: 'Retro Pop', body: '#57C838', trim: '#F25CA2', base: '#F5C542', metal: '#F5C542', cone: '#E8541E', screen: '#0c1f15', knob: '#F5C542', glow: 'rgba(124,255,90,0.45)' },
+  retro: { name: 'Retro Pop', body: '#E93D95', trim: '#FF6CB4', base: '#A81E6E', metal: '#F5C542', cone: '#E8541E', screen: '#0c1f1a', knob: '#33D6C0', glow: 'rgba(90,255,205,0.45)' },
   midnight: { name: 'Midnight', body: '#3A3B40', trim: '#54555c', base: '#26272b', metal: '#cdc9c0', cone: '#E8541E', screen: '#0c1f16', knob: '#8a8b92', glow: 'rgba(124,255,90,0.4)' },
   sunset: { name: 'Sunset', body: '#F2762E', trim: '#FFD23F', base: '#C6461B', metal: '#FFE08A', cone: '#7A2A12', screen: '#241a10', knob: '#FFD23F', glow: 'rgba(255,194,75,0.5)' },
   mint: { name: 'Mint Cream', body: '#4FC9A8', trim: '#F5F1E8', base: '#2E9C82', metal: '#eafff8', cone: '#123f34', screen: '#0c241d', knob: '#F5F1E8', glow: 'rgba(124,255,214,0.5)' },
