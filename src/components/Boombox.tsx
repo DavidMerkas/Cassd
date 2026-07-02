@@ -69,36 +69,36 @@ function Speaker({ bb }: { bb: BoomboxSkin }) {
     <div
       style={{
         position: 'relative', flex: 'none', width: 66, height: 66, borderRadius: '50%',
-        background: `radial-gradient(circle at 50% 42%, ${bb.metal} 0 26%, #1a1712 30%, #0D0C09 40%)`,
+        background: 'radial-gradient(circle at 50% 62%, #201b14 0 38%, #0D0C09 60%)',
         border: '3px solid #0D0C09',
-        boxShadow: 'inset 0 3px 7px rgba(0,0,0,0.6), inset 0 -2px 4px rgba(255,255,255,0.14), 0 3px 0 rgba(13,12,9,0.6), 0 6px 11px rgba(0,0,0,0.4)',
+        // deep inset shadow at the top rim + faint light at the bottom rim = a hole punched into the body
+        boxShadow: `inset 0 5px 9px rgba(0,0,0,0.8), inset 0 -3px 5px ${bb.metal}44, inset 0 -1px 2px rgba(255,255,255,0.14), 0 1px 0 rgba(255,255,255,0.18)`,
       }}
     >
-      {/* rainbow sunburst cone */}
+      {/* recessed cone — dimmed sunburst, shaded dark at top and lit at the bottom of the well */}
       <div
         style={{
-          position: 'absolute', inset: '17%', borderRadius: '50%', border: '2px solid #0D0C09', overflow: 'hidden',
-          background: 'repeating-conic-gradient(from 8deg, #FF7A2E 0 18deg, #FFCE3A 18deg 36deg, #FF3E6C 36deg 54deg, #FF9A2E 54deg 72deg)',
-          boxShadow: 'inset 0 0 7px rgba(0,0,0,0.5)',
+          position: 'absolute', inset: '15%', borderRadius: '50%', border: '2px solid #0D0C09', overflow: 'hidden',
+          background: 'repeating-conic-gradient(from 8deg, #D9601F 0 18deg, #D9A62C 18deg 36deg, #CE3457 36deg 54deg, #D67722 54deg 72deg)',
+          boxShadow: 'inset 0 6px 10px rgba(0,0,0,0.72)',
         }}
       >
-        {/* dish the cone: bright toward center, dark toward the surround */}
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(circle at 50% 44%, rgba(255,255,255,0.28) 0 10%, rgba(255,255,255,0) 30%, rgba(0,0,0,0.22) 72%, rgba(0,0,0,0.5) 100%)' }} />
+        {/* directional recess shade: top wall in shadow, bottom wall catches light */}
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.18) 38%, rgba(0,0,0,0) 58%, rgba(255,255,255,0.18) 100%)' }} />
+        {/* vignette to deepen the well toward the surround */}
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(circle at 50% 60%, rgba(0,0,0,0) 26%, rgba(0,0,0,0.42) 100%)' }} />
       </div>
 
-      {/* glossy purple dust-cap dome */}
+      {/* seated purple dust-cap at the bottom of the well (lit from below, shadowed on top) */}
       <div
         style={{
-          position: 'absolute', inset: '37%', borderRadius: '50%', border: '2px solid #0D0C09',
-          background: 'radial-gradient(circle at 36% 28%, #CBA0FF 0 12%, #8A3FD1 46%, #4E1E86 100%)',
-          boxShadow: 'inset 0 -2px 4px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)',
+          position: 'absolute', inset: '38%', borderRadius: '50%', border: '2px solid #0D0C09',
+          background: 'radial-gradient(circle at 50% 66%, #A15FE0 0 22%, #7B34C4 55%, #45197A 100%)',
+          boxShadow: 'inset 0 3px 4px rgba(0,0,0,0.6), inset 0 -2px 3px rgba(255,255,255,0.32), 0 -1px 2px rgba(0,0,0,0.45)',
         }}
       >
-        <div style={{ position: 'absolute', top: '15%', left: '22%', width: '32%', height: '26%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0) 70%)' }} />
+        <div style={{ position: 'absolute', bottom: '20%', left: '34%', width: '30%', height: '22%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.6), rgba(255,255,255,0) 70%)' }} />
       </div>
-
-      {/* overall glossy sheen */}
-      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.42), rgba(255,255,255,0) 44%)', pointerEvents: 'none' }} />
     </div>
   )
 }
@@ -140,15 +140,15 @@ export default function Boombox({
 
         {/* docked cassette — clipped at the slot mouth so it sits INSIDE the deck */}
         {showDockedCassette && playing && (
-          <div style={{ position: 'absolute', left: '50%', top: -8, bottom: -SLOT_LINE, width: CASS_W + 24, transform: 'translateX(-50%)', overflow: 'hidden', zIndex: 2, pointerEvents: 'none' }}>
+          <div style={{ position: 'absolute', left: '50%', top: -8, bottom: -SLOT_LINE, width: CASS_W + 24, transform: 'translateX(-50%)', overflow: armed ? 'visible' : 'hidden', zIndex: 2, pointerEvents: 'none' }}>
             <div
               onPointerDown={startPull}
               style={{
                 position: 'absolute', left: '50%', bottom: -INSERT_DEPTH, marginLeft: -CASS_W / 2,
                 cursor: 'grab', touchAction: 'none', userSelect: 'none', pointerEvents: 'auto',
                 filter: `drop-shadow(0 4px 6px rgba(0,0,0,0.45))${armed ? ' drop-shadow(0 10px 12px rgba(0,0,0,0.4))' : ''}`,
-                transform: armed ? 'translateY(-34px)' : 'translateY(0)',
-                transition: 'transform .3s cubic-bezier(.22,1,.36,1)',
+                transform: armed ? 'translateY(-62px)' : 'translateY(0)',
+                transition: 'transform .32s cubic-bezier(.22,1,.36,1)',
                 animation: 'cassd-dock .34s cubic-bezier(.22,1,.36,1)',
               }}
             >
@@ -171,16 +171,18 @@ export default function Boombox({
       {/* boombox body */}
       <div
         style={{
-          position: 'relative', zIndex: 1, borderRadius: 15, overflow: 'hidden', pointerEvents: 'auto',
+          position: 'relative', zIndex: 1, borderRadius: '5px 5px 16px 16px', overflow: 'hidden', pointerEvents: 'auto',
           border: '3px solid #0D0C09',
           background: `linear-gradient(125deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 17%, rgba(255,255,255,0) 38%), linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 34%, rgba(0,0,0,0.12)), ${bb.body}`,
           boxShadow: '0 6px 0 #0A0908, 0 16px 28px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.28), inset 4px 0 0 rgba(255,255,255,0.1), inset -4px 0 0 rgba(0,0,0,0.14)',
         }}
       >
-        {/* 3D top face: trapezoid deck holding the slot mouth */}
-        <div style={{ position: 'relative', height: 26, borderBottom: '2.5px solid #0D0C09' }}>
-          <div style={{ position: 'absolute', inset: 0, background: '#0D0C09', clipPath: 'polygon(16px 0, calc(100% - 16px) 0, 100% 100%, 0 100%)' }} />
-          <div style={{ position: 'absolute', inset: '2.5px 2.5px 0', background: `linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0.06) 55%, rgba(0,0,0,0.14)), ${bb.trim}`, clipPath: 'polygon(15px 0, calc(100% - 15px) 0, 100% 100%, 0 100%)' }} />
+        {/* 3D top face: a receding trapezoid plane (you look slightly down onto the deck) holding the slot mouth */}
+        <div style={{ position: 'relative', height: 34, borderBottom: '3px solid #0D0C09' }}>
+          <div style={{ position: 'absolute', inset: 0, background: '#0D0C09', clipPath: 'polygon(26px 0, calc(100% - 26px) 0, 100% 100%, 0 100%)' }} />
+          <div style={{ position: 'absolute', inset: '3px 3px 0', background: `linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.16) 48%, rgba(0,0,0,0.2)), ${bb.trim}`, clipPath: 'polygon(24px 0, calc(100% - 24px) 0, 100% 100%, 0 100%)' }} />
+          {/* bright far-edge highlight along the very top of the box */}
+          <div style={{ position: 'absolute', top: 1, left: '50%', transform: 'translateX(-50%)', width: 'calc(100% - 60px)', height: 2, borderRadius: 2, background: 'rgba(255,255,255,0.55)' }} />
 
           {/* the mouth — wide enough for the tape, glows while a tape hovers */}
           <div

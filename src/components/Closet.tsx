@@ -144,8 +144,8 @@ export default function Closet({
                     </div>
                   ))}
                 </div>
-                {/* shelf board — grained plank with a front lip */}
-                <div style={{ height: 13, margin: '1px 2px 0', borderRadius: '2px 2px 5px 5px', background: `${grainH}, ${cb.board}`, borderTop: '1px solid rgba(255,255,255,0.22)', boxShadow: '0 10px 13px rgba(0,0,0,0.36), inset 0 2px 0 rgba(255,255,255,0.34), inset 0 -3px 5px rgba(0,0,0,0.42)' }} />
+                {/* shelf board — grained plank with a chunky front lip */}
+                <div style={{ height: 18, margin: '1px 2px 0', borderRadius: '2px 2px 6px 6px', background: `${grainH}, ${cb.board}`, borderTop: '1px solid rgba(255,255,255,0.24)', boxShadow: '0 11px 14px rgba(0,0,0,0.38), inset 0 3px 0 rgba(255,255,255,0.34), inset 0 -4px 6px rgba(0,0,0,0.44)' }} />
               </div>
             ))}
             <div style={{ height: 10 }} />
