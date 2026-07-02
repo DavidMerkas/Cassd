@@ -64,8 +64,8 @@ export default function PullZones({ active, cb, habit }: Props) {
           ) : (
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3.5 8h17l-1 12.5H4.5z" /><path d="M3.5 8l2.2-4h12.6L20.5 8" /><line x1="12" y1="8" x2="12" y2="20.5" /></svg>
           )}
-          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 17, letterSpacing: '0.02em', lineHeight: 0.95 }}>{habit ? 'REWIND' : 'CRATE'}</div>
-          <div style={{ fontSize: 9.5, fontWeight: 800, opacity: 0.75, letterSpacing: '0.04em', color: habit ? '#F5EAD8' : '#FFD23F' }}>{habit ? 'one more rep' : 'done — worth coins'}</div>
+          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 17, letterSpacing: '0.02em', lineHeight: 0.95 }}>DONE</div>
+          <div style={{ fontSize: 9.5, fontWeight: 800, opacity: 0.75, letterSpacing: '0.04em', color: habit ? '#F5EAD8' : '#FFD23F' }}>{habit ? 'rep done · rewinds' : 'into the crate · coins'}</div>
           <div style={{ fontSize: 20, lineHeight: 0.6, opacity: active === 'crate' ? 1 : 0.5 }}>→</div>
         </div>
       </div>
