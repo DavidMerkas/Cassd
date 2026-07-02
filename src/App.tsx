@@ -10,6 +10,7 @@ import Crate from './components/Crate'
 import Shop from './components/Shop'
 import Boombox from './components/Boombox'
 import EjectOverlay from './components/EjectOverlay'
+import PullZones, { type PullZone } from './components/PullZones'
 
 const initial = load()
 
@@ -25,6 +26,7 @@ export default function App() {
   const [drag, setDrag] = useState<DragState | null>(null)
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 })
   const [overSlot, setOverSlot] = useState(false)
+  const [pullZone, setPullZone] = useState<PullZone>(null)
   const [coins, setCoins] = useState(initial.coins)
   const [owned, setOwned] = useState(initial.owned)
   const [equipped, setEquipped] = useState(initial.equipped)
@@ -74,12 +76,26 @@ export default function App() {
     return cx >= r.left && cx <= r.right && cy >= r.top - 24 && cy <= r.bottom
   }
 
+  // which side rail the pointer is over while a tape is pulled out of the deck
+  const pullZoneAt = (cx: number, cy: number): PullZone => {
+    const f = frameRef.current
+    if (!f) return null
+    const r = f.getBoundingClientRect()
+    if (cy < r.top || cy > r.bottom) return null
+    const zoneW = Math.min(122, r.width * 0.32)
+    if (cx < r.left + zoneW) return 'shelf'
+    if (cx > r.right - zoneW) return 'crate'
+    return null
+  }
+
   const attachDrag = (
     onUp: (ev: globalThis.PointerEvent) => void,
+    pull = false,
   ) => {
     const move = (ev: globalThis.PointerEvent) => {
       setDragPos(local(ev.clientX, ev.clientY))
-      setOverSlot(overDock(ev.clientX, ev.clientY))
+      if (pull) setPullZone(pullZoneAt(ev.clientX, ev.clientY))
+      else setOverSlot(overDock(ev.clientX, ev.clientY))
     }
     const up = (ev: globalThis.PointerEvent) => {
       detachRef.current?.()
@@ -124,13 +140,16 @@ export default function App() {
     if (!id) return
     setDrag({ id, pull: true })
     setDragPos(local(e.clientX, e.clientY))
-    setOverSlot(true)
+    setOverSlot(false)
+    setPullZone(pullZoneAt(e.clientX, e.clientY))
     attachDrag(ev => {
-      const onDock = overDock(ev.clientX, ev.clientY)
+      const zone = pullZoneAt(ev.clientX, ev.clientY)
       setDrag(null)
-      setOverSlot(false)
-      setEjecting(!onDock)
-    })
+      setPullZone(null)
+      if (zone === 'shelf') ejectShelf()
+      else if (zone === 'crate') ejectDone()
+      // dropped over the deck (or nowhere) — slot it back in, keep playing
+    }, true)
   }
 
   const openEject = () => setEjecting(true)
@@ -313,15 +332,17 @@ export default function App() {
           overSlot={overSlot}
           dragging={!!drag && !drag.pull}
           screen={screen}
-          crateCount={crateItems.length}
           go={go}
           startPull={startPull}
           openEject={openEject}
         />
 
+        {/* side rails while a tape is pulled out of the deck */}
+        {drag && drag.pull && <PullZones active={pullZone} cb={cb} habit={!!playing?.habit} />}
+
         {/* drag ghost */}
         {drag && dragTask && (
-          <div style={{ position: 'absolute', left: dragPos.x, top: dragPos.y, zIndex: 80, transform: `translate(-50%, -50%) rotate(${overSlot ? '-1deg' : '-6deg'}) scale(${overSlot ? 0.92 : 1})`, transition: 'transform .16s ease', pointerEvents: 'none', filter: 'drop-shadow(0 14px 20px rgba(0,0,0,0.4))' } as CSSProperties}>
+          <div style={{ position: 'absolute', left: dragPos.x, top: dragPos.y, zIndex: 80, transform: `translate(-50%, -50%) rotate(${drag.pull ? (pullZone === 'shelf' ? -12 : pullZone === 'crate' ? 12 : 0) : (overSlot ? -1 : -6)}deg) scale(${drag.pull ? (pullZone ? 1.05 : 1) : (overSlot ? 0.92 : 1)})`, transition: 'transform .16s ease', pointerEvents: 'none', filter: 'drop-shadow(0 14px 20px rgba(0,0,0,0.4))' } as CSSProperties}>
             <Cassette title={dragTask.name} color={dragTask.color} group={dragTask.group} state="shelf" cstyle={cassetteStyle} habit={dragTask.habit} w={150} />
           </div>
         )}

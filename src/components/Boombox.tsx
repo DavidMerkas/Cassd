@@ -14,7 +14,6 @@ interface Props {
   overSlot: boolean
   dragging: boolean
   screen: Screen
-  crateCount: number
   go: (s: Screen) => void
   startPull: (e: PointerEvent) => void
   openEject: () => void
@@ -87,7 +86,7 @@ const eqBar = (color: string, dur: string, delay: string): CSSProperties => ({
 
 export default function Boombox({
   dockRef, bb, playing, showDockedCassette, cassetteStyle,
-  elapsed, overSlot, dragging, screen, crateCount, go, startPull, openEject,
+  elapsed, overSlot, dragging, screen, go, startPull, openEject,
 }: Props) {
   const dropReady = dragging && !playing
   return (
@@ -249,13 +248,6 @@ export default function Boombox({
               <TabIcon s={screen} />
               {screen.toUpperCase()}
             </span>
-            {/* tapes waiting in the crate to be cashed in */}
-            {crateCount > 0 && screen !== 'crate' && (
-              <span style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 3, fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 9.5, color: '#FFC24B', textShadow: '0 0 5px rgba(255,194,75,0.55)', filter: 'drop-shadow(0 0 3px rgba(255,194,75,0.4))' }}>
-                <TabIcon s="crate" size={11} />
-                {crateCount}
-              </span>
-            )}
           </div>
           <ArrowKey dir={1} onClick={() => go(ORDER[(ORDER.indexOf(screen) + 1) % ORDER.length])} />
         </div>
