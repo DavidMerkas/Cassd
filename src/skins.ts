@@ -6,6 +6,23 @@ export const GROUPS = [
   { key: 'LIFE', color: '#E84393' },
 ] as const
 
+/** colour palette for user-created shelves (and their tapes) */
+export const PALETTE = ['#FF5C28', '#FFD23F', '#2BB3A3', '#3D7BFF', '#E84393', '#9B5DE5', '#F2762E', '#22C55E'] as const
+
+let shelfSeq = 0
+export function newShelfId() {
+  return 's' + Date.now().toString(36) + (shelfSeq++).toString(36)
+}
+
+/** starter shelves for a fresh install */
+export function defaultShelves() {
+  return [
+    { id: 'shelf-work', name: 'Work', color: '#FF5C28' },
+    { id: 'shelf-life', name: 'Life', color: '#3D7BFF' },
+    { id: 'shelf-habits', name: 'Habits', color: '#FFD23F' },
+  ]
+}
+
 export interface BoomboxSkin {
   name: string
   body: string

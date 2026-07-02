@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
-import type { Screen, Task, Category, DragState, CassetteStyle } from './types'
-import { GROUPS, BB_SKINS, CLOSET_SKINS, VALUE_PER } from './skins'
+import type { Screen, Task, Shelf, Category, DragState, CassetteStyle } from './types'
+import { BB_SKINS, CLOSET_SKINS, PALETTE, VALUE_PER, newShelfId } from './skins'
 import { load, save } from './storage'
 import Cassette from './components/Cassette'
 import Closet from './components/Closet'
@@ -15,12 +15,13 @@ const initial = load()
 
 export default function App() {
   const [tasks, setTasks] = useState<Task[]>(initial.tasks)
+  const [shelves, setShelves] = useState<Shelf[]>(initial.shelves)
   const [screen, setScreen] = useState<Screen>('closet')
   const [boomboxId, setBoomboxId] = useState<string | null>(initial.boomboxId)
   const [elapsed, setElapsed] = useState(initial.elapsed)
   const [ejectArmed, setEjectArmed] = useState(false)
   const [draftName, setDraftName] = useState('')
-  const [draftGroup, setDraftGroup] = useState(0)
+  const [draftShelfId, setDraftShelfId] = useState<string>(initial.shelves[0]?.id ?? '')
   const [draftHabit, setDraftHabit] = useState(false)
   const [drag, setDrag] = useState<DragState | null>(null)
   const [dragPos, setDragPos] = useState({ x: 0, y: 0 })
@@ -47,8 +48,8 @@ export default function App() {
 
   // persist everything that matters
   useEffect(() => {
-    save({ tasks, coins, owned, equipped, playedLifetime, boomboxId, elapsed })
-  }, [tasks, coins, owned, equipped, playedLifetime, boomboxId, elapsed])
+    save({ tasks, shelves, coins, owned, equipped, playedLifetime, boomboxId, elapsed })
+  }, [tasks, shelves, coins, owned, equipped, playedLifetime, boomboxId, elapsed])
 
   useEffect(() => () => {
     detachRef.current?.()
@@ -179,14 +180,38 @@ export default function App() {
     setEjectArmed(false)
   }
 
+  // ---- shelves ----
+  const shelfById = (id: string) => shelves.find(s => s.id === id)
+
+  const addShelf = (): string => {
+    const id = newShelfId()
+    const color = PALETTE[shelves.length % PALETTE.length]
+    setShelves(ss => [...ss, { id, name: 'New shelf', color }])
+    return id
+  }
+
+  const renameShelf = (id: string, name: string) => {
+    setShelves(ss => ss.map(s => (s.id === id ? { ...s, name } : s)))
+  }
+
+  const removeShelf = (id: string) => {
+    if (shelves.length <= 1) { flash('Keep at least one shelf'); return }
+    if (tasks.some(t => t.shelfId === id && t.state !== 'archived')) {
+      flash('Shelf still has tapes')
+      return
+    }
+    setShelves(ss => ss.filter(s => s.id !== id))
+    setDraftShelfId(cur => (cur === id ? shelves.find(s => s.id !== id)!.id : cur))
+  }
+
   const saveDraft = () => {
     const nm = draftName.trim()
     if (!nm) {
       flash('Name your tape first')
       return
     }
-    const g = GROUPS[draftGroup]
-    const task: Task = { id: 'u' + Date.now(), name: nm, group: g.key, color: g.color, habit: draftHabit, state: 'shelf' }
+    const shelf = shelfById(draftShelfId) ?? shelves[0]
+    const task: Task = { id: 'u' + Date.now(), name: nm, shelfId: shelf.id, color: shelf.color, habit: draftHabit, state: 'shelf' }
     setTasks(ts => [task, ...ts])
     setDraftName('')
     setDraftHabit(false)
@@ -237,6 +262,7 @@ export default function App() {
   const crateItems = tasks.filter(t => t.state === 'done')
   const playing = tasks.find(t => t.id === boomboxId) ?? null
   const dragTask = drag ? tasks.find(t => t.id === drag.id) ?? null : null
+  const labelFor = (t: Task | null) => (t ? (shelfById(t.shelfId)?.name ?? '') : '')
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: 24, fontFamily: 'Inter, sans-serif' }}>
@@ -284,12 +310,16 @@ export default function App() {
           {screen === 'closet' && (
             <Closet
               shelfTasks={shelfTasks}
+              shelves={shelves}
               cb={cb}
               ownedClosets={owned.closet}
               equippedCloset={equipped.closet}
               drag={drag}
               onEquipCloset={id => equip('closet', id)}
               onStartDrag={startDrag}
+              onAddShelf={addShelf}
+              onRenameShelf={renameShelf}
+              onRemoveShelf={removeShelf}
               goShop={() => go('shop')}
               goStudio={() => go('studio')}
             />
@@ -297,11 +327,13 @@ export default function App() {
           {screen === 'studio' && (
             <Studio
               draftName={draftName}
-              draftGroup={draftGroup}
+              shelves={shelves}
+              draftShelfId={draftShelfId}
               draftHabit={draftHabit}
               cassetteStyle={cassetteStyle}
               setDraftName={setDraftName}
-              setDraftGroup={setDraftGroup}
+              setDraftShelfId={setDraftShelfId}
+              onAddShelf={() => setDraftShelfId(addShelf())}
               toggleDraftHabit={() => setDraftHabit(h => !h)}
               saveDraft={saveDraft}
             />
@@ -332,6 +364,7 @@ export default function App() {
           overSlot={overSlot}
           dragging={!!drag && !drag.pull}
           armed={ejectArmed}
+          groupLabel={labelFor(playing)}
           screen={screen}
           go={go}
           startPull={startPull}
@@ -353,7 +386,7 @@ export default function App() {
         {/* drag ghost */}
         {drag && dragTask && (
           <div style={{ position: 'absolute', left: dragPos.x, top: dragPos.y, zIndex: 80, transform: `translate(-50%, -50%) rotate(${drag.pull ? (pullZone === 'shelf' ? -12 : pullZone === 'crate' ? 12 : 0) : (overSlot ? -1 : -6)}deg) scale(${drag.pull ? (pullZone ? 1.05 : 1) : (overSlot ? 0.92 : 1)})`, transition: 'transform .16s ease', pointerEvents: 'none', filter: 'drop-shadow(0 14px 20px rgba(0,0,0,0.4))' } as CSSProperties}>
-            <Cassette title={dragTask.name} color={dragTask.color} group={dragTask.group} state="shelf" cstyle={cassetteStyle} habit={dragTask.habit} w={150} />
+            <Cassette title={dragTask.name} color={dragTask.color} group={labelFor(dragTask)} state="shelf" cstyle={cassetteStyle} habit={dragTask.habit} w={150} />
           </div>
         )}
 

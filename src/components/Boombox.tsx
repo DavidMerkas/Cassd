@@ -14,6 +14,7 @@ interface Props {
   overSlot: boolean
   dragging: boolean
   armed: boolean
+  groupLabel: string
   screen: Screen
   go: (s: Screen) => void
   startPull: (e: PointerEvent) => void
@@ -110,7 +111,7 @@ const eqBar = (color: string, dur: string, delay: string): CSSProperties => ({
 
 export default function Boombox({
   dockRef, bb, playing, showDockedCassette, cassetteStyle,
-  elapsed, overSlot, dragging, armed, screen, go, startPull, openEject,
+  elapsed, overSlot, dragging, armed, groupLabel, screen, go, startPull, openEject,
 }: Props) {
   const dropReady = dragging && !playing
   return (
@@ -162,7 +163,7 @@ export default function Boombox({
                   </>
                 )}
               </div>
-              <Cassette title={playing.name} color={playing.color} group={playing.group} state="playing" cstyle={cassetteStyle} habit={playing.habit} w={CASS_W} />
+              <Cassette title={playing.name} color={playing.color} group={groupLabel} state="playing" cstyle={cassetteStyle} habit={playing.habit} w={CASS_W} />
             </div>
           </div>
         )}
@@ -219,7 +220,7 @@ export default function Boombox({
                 <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '6px 11px', gap: 3 }}>
                   <div style={{ flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                     <span style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 8, letterSpacing: '0.14em', color: '#7CFF5A', opacity: 0.85 }}>▶ SIDE A</span>
-                    <span style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 8, letterSpacing: '0.1em', color: '#FFC24B' }}>{playing.group}</span>
+                    <span style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 8, letterSpacing: '0.1em', color: '#FFC24B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 90, textAlign: 'right' }}>{groupLabel.toUpperCase()}</span>
                   </div>
                   <div style={{ flex: 'none', fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 12.5, lineHeight: 1.25, color: '#86F06B', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 0 6px rgba(124,255,90,0.5)' }}>
                     {playing.name}

@@ -1,25 +1,26 @@
 import type { CSSProperties } from 'react'
-import type { CassetteStyle } from '../types'
-import { GROUPS } from '../skins'
+import type { CassetteStyle, Shelf } from '../types'
 import { inkOn } from '../util'
 import Cassette from './Cassette'
 
 interface Props {
   draftName: string
-  draftGroup: number
+  shelves: Shelf[]
+  draftShelfId: string
   draftHabit: boolean
   cassetteStyle: CassetteStyle
   setDraftName: (v: string) => void
-  setDraftGroup: (i: number) => void
+  setDraftShelfId: (id: string) => void
+  onAddShelf: () => void
   toggleDraftHabit: () => void
   saveDraft: () => void
 }
 
 export default function Studio({
-  draftName, draftGroup, draftHabit, cassetteStyle,
-  setDraftName, setDraftGroup, toggleDraftHabit, saveDraft,
+  draftName, shelves, draftShelfId, draftHabit, cassetteStyle,
+  setDraftName, setDraftShelfId, onAddShelf, toggleDraftHabit, saveDraft,
 }: Props) {
-  const g = GROUPS[draftGroup]
+  const shelf = shelves.find(s => s.id === draftShelfId) ?? shelves[0]
   const named = draftName.trim().length > 0
 
   return (
@@ -33,8 +34,8 @@ export default function Studio({
         <div style={{ animation: 'cassd-bob 3s ease-in-out infinite' }}>
           <Cassette
             title={draftName.trim() || 'Your task…'}
-            color={g.color}
-            group={g.key}
+            color={shelf.color}
+            group={shelf.name}
             state="shelf"
             cstyle={cassetteStyle}
             habit={draftHabit}
@@ -52,25 +53,40 @@ export default function Studio({
         style={{ width: '100%', border: '2.5px solid #16140F', borderRadius: 12, padding: '14px 15px', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: '#16140F', background: '#fff', outline: 'none', boxShadow: '0 3px 0 rgba(22,20,15,0.12)' }}
       />
 
-      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(22,20,15,0.45)', margin: '18px 2px 8px' }}>SECTION</div>
+      <div style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.14em', color: 'rgba(22,20,15,0.45)', margin: '18px 2px 8px' }}>SHELF</div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {GROUPS.map((gr, i) => (
-          <button
-            key={gr.key}
-            onClick={() => setDraftGroup(i)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 7,
-              border: '2px solid #16140F',
-              background: i === draftGroup ? gr.color : '#F5F1E8',
-              color: i === draftGroup ? inkOn(gr.color) : '#16140F',
-              fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: 12,
-              padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
-            }}
-          >
-            <span style={{ width: 11, height: 11, borderRadius: '50%', background: gr.color, border: '1.5px solid #16140F' }} />
-            {gr.key}
-          </button>
-        ))}
+        {shelves.map(sh => {
+          const on = sh.id === shelf.id
+          return (
+            <button
+              key={sh.id}
+              onClick={() => setDraftShelfId(sh.id)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 7,
+                border: '2px solid #16140F',
+                background: on ? sh.color : '#F5F1E8',
+                color: on ? inkOn(sh.color) : '#16140F',
+                fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: 12,
+                padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+              }}
+            >
+              <span style={{ width: 11, height: 11, borderRadius: '50%', background: sh.color, border: '1.5px solid #16140F' }} />
+              {sh.name}
+            </button>
+          )
+        })}
+        <button
+          onClick={onAddShelf}
+          title="New shelf"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            border: '2px dashed rgba(22,20,15,0.35)', background: 'transparent',
+            color: 'rgba(22,20,15,0.55)', fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: 12,
+            padding: '9px 13px', borderRadius: 999, cursor: 'pointer',
+          }}
+        >
+          <span style={{ fontSize: 15, lineHeight: 0 }}>+</span> shelf
+        </button>
       </div>
 
       <button
