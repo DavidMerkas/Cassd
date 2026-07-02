@@ -172,18 +172,17 @@ export default function Boombox({
       {/* boombox body */}
       <div
         style={{
-          position: 'relative', zIndex: 1, borderRadius: '5px 5px 16px 16px', overflow: 'hidden', pointerEvents: 'auto',
+          position: 'relative', zIndex: 1, borderRadius: '2px 2px 16px 16px', overflow: 'hidden', pointerEvents: 'auto',
           border: '3px solid #0D0C09',
           background: `linear-gradient(125deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 17%, rgba(255,255,255,0) 38%), linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 34%, rgba(0,0,0,0.12)), ${bb.body}`,
           boxShadow: '0 6px 0 #0A0908, 0 16px 28px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.28), inset 4px 0 0 rgba(255,255,255,0.1), inset -4px 0 0 rgba(0,0,0,0.14)',
         }}
       >
-        {/* 3D top face: a receding trapezoid plane (you look slightly down onto the deck) holding the slot mouth */}
+        {/* top face: a full-width lit plane (top of the box) holding the slot mouth */}
         <div style={{ position: 'relative', height: 34, borderBottom: '3px solid #0D0C09' }}>
-          <div style={{ position: 'absolute', inset: 0, background: '#0D0C09', clipPath: 'polygon(26px 0, calc(100% - 26px) 0, 100% 100%, 0 100%)' }} />
-          <div style={{ position: 'absolute', inset: '3px 3px 0', background: `linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.16) 48%, rgba(0,0,0,0.2)), ${bb.trim}`, clipPath: 'polygon(24px 0, calc(100% - 24px) 0, 100% 100%, 0 100%)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.16) 48%, rgba(0,0,0,0.2)), ${bb.trim}` }} />
           {/* bright far-edge highlight along the very top of the box */}
-          <div style={{ position: 'absolute', top: 1, left: '50%', transform: 'translateX(-50%)', width: 'calc(100% - 60px)', height: 2, borderRadius: 2, background: 'rgba(255,255,255,0.55)' }} />
+          <div style={{ position: 'absolute', top: 1, left: 7, right: 7, height: 2, borderRadius: 2, background: 'rgba(255,255,255,0.55)' }} />
 
           {/* the mouth — wide enough for the tape, glows while a tape hovers */}
           <div
