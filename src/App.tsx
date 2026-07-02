@@ -9,7 +9,6 @@ import Studio from './components/Studio'
 import Crate from './components/Crate'
 import Shop from './components/Shop'
 import Boombox from './components/Boombox'
-import EjectOverlay from './components/EjectOverlay'
 import PullZones, { type PullZone } from './components/PullZones'
 
 const initial = load()
@@ -19,7 +18,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>('closet')
   const [boomboxId, setBoomboxId] = useState<string | null>(initial.boomboxId)
   const [elapsed, setElapsed] = useState(initial.elapsed)
-  const [ejecting, setEjecting] = useState(false)
+  const [ejectArmed, setEjectArmed] = useState(false)
   const [draftName, setDraftName] = useState('')
   const [draftGroup, setDraftGroup] = useState(0)
   const [draftHabit, setDraftHabit] = useState(false)
@@ -146,14 +145,15 @@ export default function App() {
       const zone = pullZoneAt(ev.clientX, ev.clientY)
       setDrag(null)
       setPullZone(null)
+      setEjectArmed(false)
       if (zone === 'shelf') ejectShelf()
       else if (zone === 'crate') ejectDone()
       // dropped over the deck (or nowhere) — slot it back in, keep playing
     }, true)
   }
 
-  const openEject = () => setEjecting(true)
-  const closeEject = () => setEjecting(false)
+  // EJECT arms the same physical flow as pulling: tape pops out, drag/tap it left or right
+  const openEject = () => setEjectArmed(a => !a)
 
   const ejectDone = () => {
     const t = tasks.find(x => x.id === boomboxId)
@@ -161,7 +161,7 @@ export default function App() {
     setTasks(ts => ts.map(x => (x.id === boomboxId ? { ...x, state: isHabit ? 'shelf' : 'done' } : x)))
     setBoomboxId(null)
     setElapsed(0)
-    setEjecting(false)
+    setEjectArmed(false)
     setScreen(isHabit ? 'closet' : 'crate')
     if (!isHabit) flash('Into the crate ✓')
   }
@@ -170,13 +170,13 @@ export default function App() {
     setTasks(ts => ts.map(x => (x.id === boomboxId ? { ...x, state: 'shelf' } : x)))
     setBoomboxId(null)
     setElapsed(0)
-    setEjecting(false)
+    setEjectArmed(false)
     setScreen('closet')
   }
 
   const go = (s: Screen) => {
     setScreen(s)
-    setEjecting(false)
+    setEjectArmed(false)
   }
 
   const saveDraft = () => {
@@ -331,14 +331,24 @@ export default function App() {
           elapsed={elapsed}
           overSlot={overSlot}
           dragging={!!drag && !drag.pull}
+          armed={ejectArmed}
           screen={screen}
           go={go}
           startPull={startPull}
           openEject={openEject}
         />
 
-        {/* side rails while a tape is pulled out of the deck */}
-        {drag && drag.pull && <PullZones active={pullZone} cb={cb} habit={!!playing?.habit} />}
+        {/* side rails: shown while pulling a tape out, or when EJECT armed the pop-out */}
+        {playing && ((drag && drag.pull) || ejectArmed) && (
+          <PullZones
+            active={pullZone}
+            cb={cb}
+            habit={!!playing.habit}
+            interactive={ejectArmed && !(drag && drag.pull)}
+            onShelf={ejectShelf}
+            onCrate={ejectDone}
+          />
+        )}
 
         {/* drag ghost */}
         {drag && dragTask && (
@@ -347,16 +357,6 @@ export default function App() {
           </div>
         )}
 
-        {/* eject overlay */}
-        {ejecting && playing && (
-          <EjectOverlay
-            playing={playing}
-            cassetteStyle={cassetteStyle}
-            ejectShelf={ejectShelf}
-            ejectDone={ejectDone}
-            closeEject={closeEject}
-          />
-        )}
       </div>
     </div>
   )

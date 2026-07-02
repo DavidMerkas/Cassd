@@ -7,23 +7,30 @@ interface Props {
   active: PullZone
   cb: ClosetSkin
   habit: boolean
+  /** when true (EJECT armed), rails accept a direct tap as well as a drag drop */
+  interactive?: boolean
+  onShelf?: () => void
+  onCrate?: () => void
 }
 
 const railBase: CSSProperties = {
   position: 'absolute', top: 0, bottom: 0, width: 122, zIndex: 60,
   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10,
-  pointerEvents: 'none', textAlign: 'center', padding: '0 10px',
+  textAlign: 'center', padding: '0 10px',
   transition: 'transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease, filter .18s ease',
   animation: 'cassd-fade .2s ease',
 }
 
-export default function PullZones({ active, cb, habit }: Props) {
+export default function PullZones({ active, cb, habit, interactive = false, onShelf, onCrate }: Props) {
   return (
     <>
       {/* left rail — drop here to send the tape back to the closet shelf */}
       <div
+        onClick={interactive ? onShelf : undefined}
         style={{
           ...railBase, left: 0,
+          pointerEvents: interactive ? 'auto' : 'none',
+          cursor: interactive ? 'pointer' : 'default',
           background: cb.board,
           borderRight: '3px solid #16140F',
           borderTopRightRadius: 20, borderBottomRightRadius: 20,
@@ -45,8 +52,11 @@ export default function PullZones({ active, cb, habit }: Props) {
 
       {/* right rail — drop here to finish the tape into the crate (or rewind a habit) */}
       <div
+        onClick={interactive ? onCrate : undefined}
         style={{
           ...railBase, right: 0,
+          pointerEvents: interactive ? 'auto' : 'none',
+          cursor: interactive ? 'pointer' : 'default',
           background: 'linear-gradient(180deg,#a9743f,#8a5c30)',
           borderLeft: '3px solid #16140F',
           borderTopLeftRadius: 20, borderBottomLeftRadius: 20,

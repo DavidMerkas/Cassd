@@ -13,6 +13,7 @@ interface Props {
   elapsed: number
   overSlot: boolean
   dragging: boolean
+  armed: boolean
   screen: Screen
   go: (s: Screen) => void
   startPull: (e: PointerEvent) => void
@@ -109,7 +110,7 @@ const eqBar = (color: string, dur: string, delay: string): CSSProperties => ({
 
 export default function Boombox({
   dockRef, bb, playing, showDockedCassette, cassetteStyle,
-  elapsed, overSlot, dragging, screen, go, startPull, openEject,
+  elapsed, overSlot, dragging, armed, screen, go, startPull, openEject,
 }: Props) {
   const dropReady = dragging && !playing
   return (
@@ -145,13 +146,21 @@ export default function Boombox({
               style={{
                 position: 'absolute', left: '50%', bottom: -INSERT_DEPTH, marginLeft: -CASS_W / 2,
                 cursor: 'grab', touchAction: 'none', userSelect: 'none', pointerEvents: 'auto',
-                filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.45))',
+                filter: `drop-shadow(0 4px 6px rgba(0,0,0,0.45))${armed ? ' drop-shadow(0 10px 12px rgba(0,0,0,0.4))' : ''}`,
+                transform: armed ? 'translateY(-34px)' : 'translateY(0)',
+                transition: 'transform .3s cubic-bezier(.22,1,.36,1)',
                 animation: 'cassd-dock .34s cubic-bezier(.22,1,.36,1)',
               }}
             >
-              <div style={{ position: 'absolute', left: '50%', top: -22, transform: 'translateX(-50%)', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, color: 'rgba(22,20,15,0.6)', pointerEvents: 'none' }}>
-                <span style={{ fontSize: 12, lineHeight: 1, animation: 'cassd-bob 1.8s ease-in-out infinite' }}>⌃</span>
-                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>PULL TO EJECT</span>
+              <div style={{ position: 'absolute', left: '50%', top: -22, transform: 'translateX(-50%)', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, color: 'rgba(22,20,15,0.65)', pointerEvents: 'none' }}>
+                {armed ? (
+                  <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '0.12em', whiteSpace: 'nowrap', animation: 'cassd-bob 1.4s ease-in-out infinite' }}>◄ DRAG&nbsp;·&nbsp;DROP ►</span>
+                ) : (
+                  <>
+                    <span style={{ fontSize: 12, lineHeight: 1, animation: 'cassd-bob 1.8s ease-in-out infinite' }}>⌃</span>
+                    <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '0.1em', whiteSpace: 'nowrap' }}>PULL TO EJECT</span>
+                  </>
+                )}
               </div>
               <Cassette title={playing.name} color={playing.color} group={playing.group} state="playing" cstyle={cassetteStyle} habit={playing.habit} w={CASS_W} />
             </div>
@@ -245,7 +254,7 @@ export default function Boombox({
               className={playing ? 'press' : undefined}
               style={{
                 border: '2.5px solid #0D0C09',
-                background: playing ? 'linear-gradient(180deg,#FF6E3C,#FF5C28)' : 'linear-gradient(180deg,#555046,#3e3a32)',
+                background: !playing ? 'linear-gradient(180deg,#555046,#3e3a32)' : armed ? 'linear-gradient(180deg,#FFD23F,#F5B800)' : 'linear-gradient(180deg,#FF6E3C,#FF5C28)',
                 color: playing ? '#16140F' : 'rgba(245,241,232,0.35)',
                 fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.06em',
                 padding: '8px 0', borderRadius: 9, cursor: playing ? 'pointer' : 'default',
@@ -256,7 +265,7 @@ export default function Boombox({
                 '--sh-a': '0 1px 0 #0D0C09, inset 0 1px 0 rgba(255,255,255,0.35)',
               } as CSSProperties}
             >
-              <span style={{ fontSize: 14, lineHeight: 0 }}>⏏</span> EJECT
+              <span style={{ fontSize: 14, lineHeight: 0 }}>⏏</span> {armed ? 'CANCEL' : 'EJECT'}
             </button>
           </div>
 
