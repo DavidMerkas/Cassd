@@ -67,14 +67,37 @@ function Speaker({ bb }: { bb: BoomboxSkin }) {
   return (
     <div
       style={{
-        position: 'relative', flex: 'none', width: 60, height: 60, borderRadius: '50%',
-        background: `radial-gradient(circle at 50% 45%, ${bb.metal} 0 18%, #0D0C09 19% 28%, ${bb.cone} 29% 45%, #0D0C09 46% 54%, ${bb.cone} 55% 77%, #0D0C09 78%)`,
+        position: 'relative', flex: 'none', width: 66, height: 66, borderRadius: '50%',
+        background: `radial-gradient(circle at 50% 42%, ${bb.metal} 0 26%, #1a1712 30%, #0D0C09 40%)`,
         border: '3px solid #0D0C09',
-        boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.6), inset 0 -2px 4px rgba(255,255,255,0.12), 0 3px 0 rgba(13,12,9,0.6)',
+        boxShadow: 'inset 0 3px 7px rgba(0,0,0,0.6), inset 0 -2px 4px rgba(255,255,255,0.14), 0 3px 0 rgba(13,12,9,0.6), 0 6px 11px rgba(0,0,0,0.4)',
       }}
     >
-      {/* specular highlight so the cone reads as dished-in */}
-      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(circle at 32% 24%, rgba(255,255,255,0.28), rgba(255,255,255,0) 42%)', pointerEvents: 'none' }} />
+      {/* rainbow sunburst cone */}
+      <div
+        style={{
+          position: 'absolute', inset: '17%', borderRadius: '50%', border: '2px solid #0D0C09', overflow: 'hidden',
+          background: 'repeating-conic-gradient(from 8deg, #FF7A2E 0 18deg, #FFCE3A 18deg 36deg, #FF3E6C 36deg 54deg, #FF9A2E 54deg 72deg)',
+          boxShadow: 'inset 0 0 7px rgba(0,0,0,0.5)',
+        }}
+      >
+        {/* dish the cone: bright toward center, dark toward the surround */}
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(circle at 50% 44%, rgba(255,255,255,0.28) 0 10%, rgba(255,255,255,0) 30%, rgba(0,0,0,0.22) 72%, rgba(0,0,0,0.5) 100%)' }} />
+      </div>
+
+      {/* glossy purple dust-cap dome */}
+      <div
+        style={{
+          position: 'absolute', inset: '37%', borderRadius: '50%', border: '2px solid #0D0C09',
+          background: 'radial-gradient(circle at 36% 28%, #CBA0FF 0 12%, #8A3FD1 46%, #4E1E86 100%)',
+          boxShadow: 'inset 0 -2px 4px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)',
+        }}
+      >
+        <div style={{ position: 'absolute', top: '15%', left: '22%', width: '32%', height: '26%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0) 70%)' }} />
+      </div>
+
+      {/* overall glossy sheen */}
+      <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.42), rgba(255,255,255,0) 44%)', pointerEvents: 'none' }} />
     </div>
   )
 }
@@ -141,8 +164,8 @@ export default function Boombox({
         style={{
           position: 'relative', zIndex: 1, borderRadius: 15, overflow: 'hidden', pointerEvents: 'auto',
           border: '3px solid #0D0C09',
-          background: `linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 34%, rgba(0,0,0,0.08)), ${bb.body}`,
-          boxShadow: '0 6px 0 #0A0908, 0 16px 28px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.2), inset 4px 0 0 rgba(255,255,255,0.07), inset -4px 0 0 rgba(0,0,0,0.12)',
+          background: `linear-gradient(125deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 17%, rgba(255,255,255,0) 38%), linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 34%, rgba(0,0,0,0.12)), ${bb.body}`,
+          boxShadow: '0 6px 0 #0A0908, 0 16px 28px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.28), inset 4px 0 0 rgba(255,255,255,0.1), inset -4px 0 0 rgba(0,0,0,0.14)',
         }}
       >
         {/* 3D top face: trapezoid deck holding the slot mouth */}
