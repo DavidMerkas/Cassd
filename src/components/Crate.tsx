@@ -17,6 +17,15 @@ const coinStyle: CSSProperties = {
   fontFamily: 'Anton, sans-serif', fontSize: 11, color: '#7a5b06',
 }
 
+const screw: CSSProperties = {
+  position: 'absolute', width: 6, height: 6, borderRadius: '50%',
+  background: 'radial-gradient(circle at 35% 30%, #a2703f, #3a2416)',
+  border: '1px solid #2a1c11', zIndex: 1,
+}
+
+// horizontal wood grain — layered incommensurate periods so it never looks tiled
+const grainH = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 4px), repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 8px), repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 13px)'
+
 export default function Crate({ crateItems, playedLifetime, emptyCrate }: Props) {
   const crateValue = crateItems.length * VALUE_PER
   const has = crateItems.length > 0
@@ -35,8 +44,14 @@ export default function Crate({ crateItems, playedLifetime, emptyCrate }: Props)
       </div>
 
       {/* the crate box */}
-      <div style={{ background: 'linear-gradient(180deg,#a9743f,#8a5c30)', border: '3px solid #16140F', borderRadius: 14, padding: 12, boxShadow: '0 12px 26px rgba(0,0,0,0.25), inset 0 2px 0 rgba(255,255,255,0.2)' }}>
-        <div style={{ background: 'repeating-linear-gradient(90deg,#7c4f26 0 3px,transparent 3px 8px), linear-gradient(180deg,#6b4a2d,#4a3220)', border: '2px solid #3a2416', borderRadius: 8, minHeight: 150, padding: 12, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ position: 'relative', background: `${grainH}, linear-gradient(180deg,#b47c46,#875a2f)`, border: '3px solid #16140F', borderRadius: 12, padding: 11, boxShadow: '0 14px 28px rgba(0,0,0,0.28), inset 0 2px 0 rgba(255,255,255,0.22)', overflow: 'hidden' }}>
+        <span style={{ ...screw, top: 5, left: 6 }} />
+        <span style={{ ...screw, top: 5, right: 6 }} />
+        <span style={{ ...screw, bottom: 5, left: 6 }} />
+        <span style={{ ...screw, bottom: 5, right: 6 }} />
+        <div style={{ position: 'relative', background: 'linear-gradient(180deg,#5b3e26,#3d2818)', border: '2px solid #2a1c11', borderRadius: 6, minHeight: 150, padding: 12, display: 'flex', flexDirection: 'column', boxShadow: 'inset 0 10px 16px rgba(0,0,0,0.5)', overflow: 'hidden' }}>
+          {/* horizontal plank grooves on the back wall */}
+          <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.34) 0 2px, rgba(255,255,255,0.03) 2px 3px, transparent 3px 24px)', pointerEvents: 'none' }} />
           {!has && (
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: 8, padding: '14px 10px' }}>
               <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 18, color: '#F5EAD8' }}>Crate's empty</div>

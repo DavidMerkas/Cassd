@@ -25,6 +25,11 @@ export default function Closet({
     return { key: g.key, color: g.color, count: items.length, items }
   }).filter(sec => sec.items.length > 0)
 
+  // procedural wood grain — layered incommensurate periods so it never looks tiled.
+  // grainV = grain running vertically (for posts/frame), grainH = horizontally (for shelves/molding)
+  const grainV = 'repeating-linear-gradient(90deg, rgba(0,0,0,0.055) 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 7px), repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 12px)'
+  const grainH = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 4px), repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 8px), repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 13px)'
+
   return (
     <div style={{ padding: '6px 16px 22px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '2px 2px 12px' }}>
@@ -88,10 +93,27 @@ export default function Closet({
 
       {/* the cabinet */}
       {sections.length > 0 && (
-        <div style={{ background: cb.frame, border: '3px solid #16140F', borderRadius: 16, padding: 9, boxShadow: '0 10px 24px rgba(0,0,0,0.2), inset 0 2px 0 rgba(255,255,255,0.18)' }}>
-          <div style={{ background: cb.back, borderRadius: 9, padding: '4px 0', border: '2px solid rgba(0,0,0,0.25)', overflow: 'hidden' }}>
+        <div style={{
+          position: 'relative',
+          background: `${grainV}, ${cb.frame}`,
+          border: '3px solid #16140F', borderRadius: 14,
+          padding: '0 9px',
+          boxShadow: '0 16px 30px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.22)',
+          overflow: 'hidden',
+        }}>
+          {/* crown molding */}
+          <div style={{ height: 15, margin: '0 -9px', background: `${grainH}, ${cb.board}`, borderBottom: '2px solid #16140F', boxShadow: 'inset 0 3px 0 rgba(255,255,255,0.24), 0 4px 7px rgba(0,0,0,0.3)' }} />
+
+          {/* recessed interior */}
+          <div style={{ position: 'relative', margin: '9px 0', background: cb.back, borderRadius: 7, border: '2px solid rgba(0,0,0,0.34)', boxShadow: 'inset 0 11px 16px rgba(0,0,0,0.32), inset 0 -5px 11px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
+            {/* beadboard planks on the back wall */}
+            <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0 1.5px, rgba(255,255,255,0.03) 1.5px 3px, transparent 3px 28px)', pointerEvents: 'none' }} />
+            {/* side posts framing the interior */}
+            <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 7, background: `${grainV}, ${cb.frame}`, boxShadow: '3px 0 7px rgba(0,0,0,0.34)' }} />
+            <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: 7, background: `${grainV}, ${cb.frame}`, boxShadow: '-3px 0 7px rgba(0,0,0,0.34)' }} />
+
             {sections.map(sec => (
-              <div key={sec.key} style={{ padding: '8px 8px 0' }}>
+              <div key={sec.key} style={{ position: 'relative', padding: '9px 13px 0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 7, margin: '0 2px 6px' }}>
                   <span style={{ width: 10, height: 10, borderRadius: '50%', background: sec.color, border: '2px solid #16140F' }} />
                   <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.04em', color: cb.ink }}>{sec.key}</span>
@@ -122,10 +144,15 @@ export default function Closet({
                     </div>
                   ))}
                 </div>
-                <div style={{ height: 13, marginTop: 1, borderRadius: '1px 1px 5px 5px', background: cb.board, boxShadow: '0 8px 12px rgba(0,0,0,0.28), inset 0 2px 0 rgba(255,255,255,0.25), inset 0 -3px 4px rgba(0,0,0,0.35)' }} />
+                {/* shelf board — grained plank with a front lip */}
+                <div style={{ height: 13, margin: '1px 2px 0', borderRadius: '2px 2px 5px 5px', background: `${grainH}, ${cb.board}`, borderTop: '1px solid rgba(255,255,255,0.22)', boxShadow: '0 10px 13px rgba(0,0,0,0.36), inset 0 2px 0 rgba(255,255,255,0.34), inset 0 -3px 5px rgba(0,0,0,0.42)' }} />
               </div>
             ))}
+            <div style={{ height: 10 }} />
           </div>
+
+          {/* plinth / base */}
+          <div style={{ height: 12, margin: '0 -9px', background: `${grainH}, ${cb.board}`, borderTop: '2px solid #16140F', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.18)' }} />
         </div>
       )}
     </div>
