@@ -90,7 +90,7 @@ export default function Boombox({
 }: Props) {
   const dropReady = dragging && !playing
   return (
-    <div ref={dockRef} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 10, background: 'linear-gradient(180deg, rgba(236,229,214,0) 0%, rgba(236,229,214,0.92) 58px, #ECE5D6 96px)', padding: '6px 16px 16px', overflow: 'visible' }}>
+    <div ref={dockRef} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 10, background: 'linear-gradient(180deg, rgba(236,229,214,0) 0%, rgba(236,229,214,0.92) 58px, #ECE5D6 96px)', padding: '6px 16px 16px', overflow: 'visible', pointerEvents: 'none' }}>
       {/* slot zone — fixed height whether or not a tape is docked */}
       <div style={{ position: 'relative', height: ZONE_H }}>
         {/* drop target while dragging a tape from the closet */}
@@ -139,7 +139,7 @@ export default function Boombox({
       {/* boombox body */}
       <div
         style={{
-          position: 'relative', zIndex: 1, borderRadius: 15, overflow: 'hidden',
+          position: 'relative', zIndex: 1, borderRadius: 15, overflow: 'hidden', pointerEvents: 'auto',
           border: '3px solid #0D0C09',
           background: `linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 34%, rgba(0,0,0,0.08)), ${bb.body}`,
           boxShadow: '0 6px 0 #0A0908, 0 16px 28px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.2), inset 4px 0 0 rgba(255,255,255,0.07), inset -4px 0 0 rgba(0,0,0,0.12)',
