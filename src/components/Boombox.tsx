@@ -23,6 +23,17 @@ interface Props {
 /* screens cycled by the deck's tab dial */
 const ORDER: Screen[] = ['closet', 'studio', 'crate', 'shop']
 
+function TabIcon({ s, size = 13 }: { s: Screen; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" style={{ flex: 'none' }}>
+      {s === 'closet' && <><rect x="4" y="3" width="16" height="18" rx="1.5" /><line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" /></>}
+      {s === 'studio' && <><path d="M4 20l4.5-1.2L19 8.3l-3.3-3.3L5.2 15.5 4 20z" /><path d="M13.5 6.5l3.3 3.3" /></>}
+      {s === 'crate' && <><path d="M3.5 8h17l-1 12.5H4.5z" /><path d="M3.5 8l2.2-4h12.6L20.5 8" /><line x1="12" y1="8" x2="12" y2="20.5" /></>}
+      {s === 'shop' && <><path d="M5 8h14l-1.2 12.5H6.2z" /><path d="M8.5 8a3.5 3.5 0 0 1 7 0" /></>}
+    </svg>
+  )
+}
+
 function ArrowKey({ dir, onClick }: { dir: -1 | 1; onClick: () => void }) {
   return (
     <button
@@ -234,12 +245,15 @@ export default function Boombox({
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 7, padding: '2px 13px 12px' }}>
           <ArrowKey dir={-1} onClick={() => go(ORDER[(ORDER.indexOf(screen) + ORDER.length - 1) % ORDER.length])} />
           <div style={{ flex: 1, position: 'relative', minHeight: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', background: bb.screen, border: '2.5px solid #0D0C09', borderRadius: 8, overflow: 'hidden', boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.85), 0 1px 0 rgba(255,255,255,0.12)' }}>
-            <span key={screen} style={{ fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 11.5, letterSpacing: '0.22em', color: '#7CFF5A', textShadow: '0 0 6px rgba(124,255,90,0.5)', animation: 'cassd-lcd-in .18s ease' }}>
+            <span key={screen} style={{ display: 'flex', alignItems: 'center', gap: 7, fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 11.5, letterSpacing: '0.22em', color: '#7CFF5A', textShadow: '0 0 6px rgba(124,255,90,0.5)', filter: 'drop-shadow(0 0 3px rgba(124,255,90,0.45))', animation: 'cassd-lcd-in .18s ease' }}>
+              <TabIcon s={screen} />
               {screen.toUpperCase()}
             </span>
+            {/* tapes waiting in the crate to be cashed in */}
             {crateCount > 0 && screen !== 'crate' && (
-              <span style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 9.5, color: '#FFC24B', textShadow: '0 0 5px rgba(255,194,75,0.55)' }}>
-                +{crateCount}
+              <span style={{ position: 'absolute', right: 9, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 3, fontFamily: "'Space Mono', monospace", fontWeight: 700, fontSize: 9.5, color: '#FFC24B', textShadow: '0 0 5px rgba(255,194,75,0.55)', filter: 'drop-shadow(0 0 3px rgba(255,194,75,0.4))' }}>
+                <TabIcon s="crate" size={11} />
+                {crateCount}
               </span>
             )}
           </div>
