@@ -209,6 +209,29 @@ export default function Closet({
               <span style={{ fontSize: 15, lineHeight: 0 }}>+</span> NEW SHELF
             </button>
           </div>
+
+          {/* cabinet doors — swing open every time you visit the closet */}
+          <div style={{ position: 'absolute', inset: 0, zIndex: 6, pointerEvents: 'none', perspective: 900 }}>
+            {[0, 1].map(side => (
+              <div
+                key={side}
+                style={{
+                  position: 'absolute', top: 0, bottom: 0,
+                  [side === 0 ? 'left' : 'right']: 0, width: '50%',
+                  transformOrigin: side === 0 ? 'left center' : 'right center',
+                  animation: `${side === 0 ? 'cassd-door-l' : 'cassd-door-r'} .8s cubic-bezier(.34,.9,.42,1) forwards`,
+                  background: `${grainV}, ${cb.board}`,
+                  border: '2px solid #16140F',
+                  boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.2), 0 6px 14px rgba(0,0,0,0.35)',
+                } as CSSProperties}
+              >
+                {/* inset door panel */}
+                <div style={{ position: 'absolute', inset: '12px 12px 12px 12px', borderRadius: 4, border: '2px solid rgba(0,0,0,0.28)', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.26), inset 0 -1px 0 rgba(255,255,255,0.16)' }} />
+                {/* knob by the centre seam */}
+                <div style={{ position: 'absolute', [side === 0 ? 'right' : 'left']: 7, top: '50%', width: 9, height: 9, borderRadius: '50%', background: 'radial-gradient(circle at 38% 32%, #4a4034, #16140F)', border: '1.5px solid #16140F', transform: 'translateY(-50%)' } as CSSProperties} />
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* plinth / base */}

@@ -15,6 +15,7 @@ interface Props {
 
 // wood grain, matching the closet's procedural texture
 const grainH = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 4px), repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 8px), repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 13px)'
+const grainV = 'repeating-linear-gradient(90deg, rgba(0,0,0,0.055) 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 7px), repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 12px)'
 
 const railBase: CSSProperties = {
   position: 'absolute', top: '44%', zIndex: 60, width: 112, height: 190,
@@ -27,32 +28,59 @@ const railBase: CSSProperties = {
 export default function PullZones({ active, cb, habit, interactive = false, onShelf, onCrate }: Props) {
   return (
     <>
-      {/* left target — a little wooden shelf poking in: drop = back to the closet */}
+      {/* left target — the closet with CLOSED doors: drop = back inside. Doors crack open when hovered */}
       <div
         onClick={interactive ? onShelf : undefined}
         style={{
           ...railBase, left: 0,
           pointerEvents: interactive ? 'auto' : 'none',
           cursor: interactive ? 'pointer' : 'default',
-          background: `${grainH}, ${cb.board}`,
+          background: `${grainH}, ${cb.frame}`,
           border: '3px solid #16140F', borderLeft: 'none',
-          borderRadius: '0 18px 18px 0',
+          borderRadius: '0 14px 14px 0',
           color: '#F5EAD8',
           transform: `translate(${active === 'shelf' ? '0' : '-30px'}, -50%)`,
-          filter: active === 'shelf' ? 'brightness(1.1)' : 'brightness(0.94)',
+          filter: active === 'shelf' ? 'brightness(1.08)' : 'brightness(0.94)',
           boxShadow: active === 'shelf'
-            ? '10px 6px 26px rgba(0,0,0,0.42), inset -4px 0 0 rgba(255,255,255,0.2), inset 0 3px 0 rgba(255,255,255,0.22)'
-            : '5px 4px 14px rgba(0,0,0,0.3), inset -3px 0 0 rgba(255,255,255,0.14), inset 0 3px 0 rgba(255,255,255,0.18)',
+            ? '10px 6px 26px rgba(0,0,0,0.42), inset 0 3px 0 rgba(255,255,255,0.22)'
+            : '5px 4px 14px rgba(0,0,0,0.3), inset 0 3px 0 rgba(255,255,255,0.18)',
+          padding: 0, overflow: 'hidden',
         }}
       >
-        {/* two little shelf boards to sell "closet" */}
-        <div style={{ position: 'absolute', left: 10, right: 14, top: 26, height: 7, borderRadius: '0 3px 3px 0', background: 'rgba(22,20,15,0.35)', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.18)' }} />
-        <div style={{ position: 'absolute', left: 10, right: 14, bottom: 26, height: 7, borderRadius: '0 3px 3px 0', background: 'rgba(22,20,15,0.35)', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.18)' }} />
+        {/* crown + plinth strips */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 10, background: `${grainH}, ${cb.board}`, borderBottom: '2px solid #16140F', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.22)' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 9, background: `${grainH}, ${cb.board}`, borderTop: '2px solid #16140F' }} />
 
-        <div style={{ transform: active === 'shelf' ? 'scale(1.12)' : 'scale(1)', transition: 'transform .18s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textShadow: '0 1px 2px rgba(0,0,0,0.45)' }}>
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5" /><line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" /></svg>
-          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 15, letterSpacing: '0.03em', lineHeight: 0.95 }}>SHELF</div>
-          <div style={{ fontSize: 9, fontWeight: 800, opacity: 0.8, letterSpacing: '0.04em' }}>still pending</div>
+        {/* dark interior peeking through the seam */}
+        <div style={{ position: 'absolute', inset: '12px 5px 11px 0', background: 'linear-gradient(180deg, #241a10, #16100a)' }} />
+
+        {/* the two doors, hinged at the outer edges */}
+        <div style={{ position: 'absolute', inset: '12px 5px 11px 0', perspective: 420 }}>
+          {[0, 1].map(side => (
+            <div
+              key={side}
+              style={{
+                position: 'absolute', top: 0, bottom: 0,
+                [side === 0 ? 'left' : 'right']: 0, width: '50%',
+                transformOrigin: side === 0 ? 'left center' : 'right center',
+                transform: active === 'shelf' ? `rotateY(${side === 0 ? -24 : 24}deg)` : 'rotateY(0deg)',
+                transition: 'transform .2s cubic-bezier(.22,1,.36,1)',
+                background: `${grainV}, ${cb.board}`,
+                border: '2px solid #16140F',
+                boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.16)',
+              } as CSSProperties}
+            >
+              <div style={{ position: 'absolute', inset: 7, borderRadius: 3, border: '1.5px solid rgba(0,0,0,0.3)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.24), inset 0 -1px 0 rgba(255,255,255,0.14)' }} />
+              <div style={{ position: 'absolute', [side === 0 ? 'right' : 'left']: 5, top: '50%', width: 6, height: 6, borderRadius: '50%', background: '#16140F', transform: 'translateY(-50%)' } as CSSProperties} />
+            </div>
+          ))}
+        </div>
+
+        {/* label plate over the doors */}
+        <div style={{ position: 'relative', zIndex: 2, transform: active === 'shelf' ? 'scale(1.1)' : 'scale(1)', transition: 'transform .18s ease', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="18" rx="1.5" /><line x1="4" y1="9" x2="20" y2="9" /><line x1="4" y1="15" x2="20" y2="15" /></svg>
+          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: 14, letterSpacing: '0.03em', lineHeight: 0.95 }}>CLOSET</div>
+          <div style={{ fontSize: 9, fontWeight: 800, opacity: 0.85, letterSpacing: '0.04em' }}>still pending</div>
           <div style={{ fontSize: 17, lineHeight: 0.6, opacity: active === 'shelf' ? 1 : 0.55 }}>←</div>
         </div>
       </div>
