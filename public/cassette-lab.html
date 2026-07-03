@@ -1,0 +1,748 @@
+<!doctype html>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CASSD — Cassette Design Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink: #16140F; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: radial-gradient(120% 80% at 50% 0%, #2a2722, #191712 60%, #100e0b);
+    color: #ECE5D6; font-family: Inter, system-ui, sans-serif; padding: 40px 20px 80px;
+  }
+  header { max-width: 980px; margin: 0 auto 8px; }
+  h1 { font-family: Anton, sans-serif; font-size: 34px; letter-spacing: .02em; margin: 0; }
+  .sub { color: rgba(236,229,214,.6); font-size: 14px; margin: 6px 0 0; max-width: 640px; line-height: 1.5; }
+  .grid {
+    max-width: 980px; margin: 34px auto 0; display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 26px;
+  }
+  .card {
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.16));
+    border: 1px solid rgba(255,255,255,.09); border-radius: 18px; padding: 26px 22px 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
+  }
+  .stage { padding: 18px 6px 8px; display: grid; place-items: center; width: 100%; }
+  .meta { text-align: center; }
+  .num { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: .2em; color: #FFC24B; }
+  .name { font-family: Anton, sans-serif; font-size: 20px; letter-spacing: .02em; margin: 2px 0 4px; }
+  .blurb { font-size: 12.5px; line-height: 1.5; color: rgba(236,229,214,.65); max-width: 300px; margin: 0 auto; }
+
+  /* ============ shared cassette frame (320 x 200) ============ */
+  .cass { position: relative; width: 320px; height: 200px; }
+  .spin1 { animation: spin 2.6s linear infinite; }
+  .spin2 { animation: spin 3.4s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- reel builder ---- */
+  .reel { position: relative; width: 58px; height: 58px; border-radius: 50%; }
+  .reel .teeth { position: absolute; inset: 0; border-radius: 50%;
+    background: repeating-conic-gradient(#e9e2d2 0 14deg, #b9b09b 14deg 30deg); }
+  .reel .hub { position: absolute; inset: 34%; border-radius: 50%;
+    background: radial-gradient(circle at 40% 34%, #4a4034, #1a1712); border: 2px solid #0d0c09; }
+  .reel .spoke { position: absolute; top: 50%; left: 50%; width: 3px; height: 46%;
+    background: #0d0c09; transform-origin: top center; border-radius: 3px; }
+
+  /* =================================================================
+     1 · STUDIO MASTER  — realistic skeuomorphic plastic
+  ================================================================= */
+  .v1 .shell { position: absolute; inset: 0; border-radius: 16px; border: 2px solid #0d0c09;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,0) 22%, rgba(0,0,0,.28)),
+      linear-gradient(160deg, #3b3f47, #23262c 60%, #171a1f);
+    box-shadow: 0 18px 30px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.18);
+    overflow: hidden; }
+  .v1 .screw { position: absolute; width: 9px; height: 9px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #8a8f99, #33373d); border: 1px solid #0d0c09; }
+  .v1 .plate { position: absolute; left: 26px; right: 26px; top: 22px; height: 84px; border-radius: 8px;
+    background: linear-gradient(180deg, #f4efe3, #ded6c4);
+    border: 1.5px solid #0d0c09; box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 2px 4px rgba(0,0,0,.3);
+    padding: 9px 12px; }
+  .v1 .title { font-weight: 800; font-size: 16px; color: var(--ink); }
+  .v1 .rule { height: 1px; background: repeating-linear-gradient(90deg, rgba(22,20,15,.4) 0 6px, transparent 6px 10px); margin: 7px 0; }
+  .v1 .hand { font-family: 'Space Mono', monospace; font-size: 11px; color: #6a5d45; }
+  .v1 .window { position: absolute; left: 60px; right: 60px; top: 118px; height: 60px; border-radius: 8px;
+    background: radial-gradient(120% 140% at 50% -10%, #2a2620, #0b0a08); border: 2px solid #0d0c09;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,.8); display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .v1 .tape { position: absolute; left: 22%; right: 22%; top: 50%; height: 12px; transform: translateY(-50%);
+    background: linear-gradient(180deg, #6a5540, #3a2c1e); border-top: 1px solid rgba(255,255,255,.18); }
+  .v1 .reel .teeth { background: repeating-conic-gradient(#d8d0be 0 14deg, #9a927e 14deg 30deg); }
+
+  /* =================================================================
+     2 · NEON NIGHTS — synthwave glow
+  ================================================================= */
+  .v2 .shell { position: absolute; inset: 0; border-radius: 16px; border: 2px solid #ff3d9a;
+    background: linear-gradient(180deg, #241633, #140a24 70%, #0a0616);
+    box-shadow: 0 0 0 2px rgba(255,61,154,.25), 0 0 26px rgba(255,61,154,.35), 0 16px 30px rgba(0,0,0,.5);
+    overflow: hidden; }
+  .v2 .grid-bg { position: absolute; left: 0; right: 0; bottom: 0; height: 70%;
+    background: linear-gradient(transparent, rgba(0,229,255,.12)),
+      repeating-linear-gradient(90deg, rgba(0,229,255,.25) 0 1px, transparent 1px 26px),
+      repeating-linear-gradient(0deg, rgba(0,229,255,.22) 0 1px, transparent 1px 18px);
+    transform: perspective(160px) rotateX(52deg); transform-origin: bottom; opacity: .7; }
+  .v2 .sun { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); width: 74px; height: 74px; border-radius: 50%;
+    background: linear-gradient(180deg, #ffe259, #ff5db1); box-shadow: 0 0 24px rgba(255,93,177,.7); }
+  .v2 .plate { position: absolute; left: 24px; right: 24px; top: 24px; height: 40px; border-radius: 7px;
+    background: rgba(6,3,16,.55); border: 1.5px solid #00e5ff; box-shadow: 0 0 12px rgba(0,229,255,.5) inset; padding: 8px 12px; }
+  .v2 .title { font-family: Anton, sans-serif; letter-spacing: .04em; font-size: 17px; color: #fff;
+    text-shadow: 0 0 8px #ff3d9a, 0 0 2px #fff; }
+  .v2 .window { position: absolute; left: 54px; right: 54px; top: 112px; height: 62px; border-radius: 40px;
+    background: #05030d; border: 2px solid #ff3d9a; box-shadow: inset 0 0 12px rgba(255,61,154,.5);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .v2 .reel .teeth { background: repeating-conic-gradient(#00e5ff 0 14deg, #142a44 14deg 30deg); box-shadow: 0 0 8px rgba(0,229,255,.6); }
+  .v2 .reel .hub { background: radial-gradient(circle at 40% 34%, #ff8cc6, #6a1140); border-color: #ff3d9a; }
+  .v2 .tape { position: absolute; left: 24%; right: 24%; top: 50%; height: 8px; transform: translateY(-50%);
+    background: linear-gradient(180deg, #ff3d9a, #7a1d54); box-shadow: 0 0 8px rgba(255,61,154,.6); }
+
+  /* =================================================================
+     3 · STICKER BOMB — playful hand-made, the cool sticker style
+  ================================================================= */
+  .v3 .shell { position: absolute; inset: 0; border-radius: 15px; border: 3px solid var(--ink);
+    background: linear-gradient(180deg, #ff7a3d, #f2542d); box-shadow: 5px 6px 0 var(--ink); overflow: hidden; }
+  .v3 .dots { position: absolute; inset: 0; opacity: .18;
+    background: radial-gradient(circle, #16140F 1.4px, transparent 1.6px) 0 0 / 14px 14px; }
+  .v3 .plate { position: absolute; left: 20px; right: 20px; top: 20px; height: 82px; border-radius: 6px;
+    background: #fbf5e7; border: 2.5px solid var(--ink); transform: rotate(-1.6deg);
+    box-shadow: 3px 3px 0 rgba(22,20,15,.25); padding: 8px 11px; }
+  .v3 .washi { position: absolute; width: 46px; height: 16px; background: repeating-linear-gradient(45deg, #2bb3a3 0 6px, #22998c 6px 12px);
+    border: 2px solid var(--ink); opacity: .95; }
+  .v3 .title { font-family: Anton, sans-serif; font-size: 18px; letter-spacing: .02em; color: var(--ink); }
+  .v3 .doodle { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #b23b16; }
+  .v3 .window { position: absolute; left: 58px; right: 58px; top: 116px; height: 58px; border-radius: 999px;
+    background: #0d0c09; border: 3px solid var(--ink); display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .v3 .tape { position: absolute; left: 26%; right: 26%; top: 50%; height: 8px; transform: translateY(-50%); background: #3a3126;
+    border-top: 1.5px solid rgba(245,241,232,.25); border-bottom: 1.5px solid rgba(245,241,232,.25); }
+  .v3 .badge { position: absolute; top: -8px; right: 14px; width: 34px; height: 34px; border-radius: 50%;
+    background: #FFD23F; border: 3px solid var(--ink); display: grid; place-items: center; font-weight: 800; transform: rotate(10deg); box-shadow: 2px 2px 0 var(--ink); }
+
+  /* =================================================================
+     4 · CHROME FOIL — premium metallic / holographic
+  ================================================================= */
+  .v4 .shell { position: absolute; inset: 0; border-radius: 16px; border: 2px solid #2a2622; overflow: hidden;
+    background: linear-gradient(135deg, #f7f8fb 0%, #c7cdd8 22%, #eef0f4 40%, #aeb6c4 60%, #f2f4f8 78%, #b9c0cd 100%);
+    box-shadow: 0 16px 30px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.9); }
+  .v4 .holo { position: absolute; inset: 0; mix-blend-mode: color-dodge; opacity: .5;
+    background: linear-gradient(115deg, rgba(255,0,128,.5), rgba(0,200,255,.5) 30%, rgba(120,255,180,.5) 50%, rgba(255,220,0,.5) 70%, rgba(255,0,180,.5)); }
+  .v4 .plate { position: absolute; left: 26px; right: 26px; top: 22px; height: 78px; border-radius: 6px;
+    background: linear-gradient(180deg, #17151f, #06050a); border: 1.5px solid #000; padding: 10px 13px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+  .v4 .title { font-family: Anton, sans-serif; font-size: 17px; letter-spacing: .06em;
+    background: linear-gradient(90deg, #ffd76b, #fff6d6, #d99b2b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .v4 .emboss { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .18em; color: #9aa0ab; margin-top: 6px; }
+  .v4 .window { position: absolute; left: 58px; right: 58px; top: 114px; height: 60px; border-radius: 8px;
+    background: linear-gradient(180deg, #1a1720, #05040a); border: 2px solid #2a2622; box-shadow: inset 0 2px 6px rgba(0,0,0,.8);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 6px; }
+  .v4 .reel .teeth { background: repeating-conic-gradient(#e8ebf1 0 14deg, #9aa2b1 14deg 30deg); }
+  .v4 .reel .hub { background: radial-gradient(circle at 40% 34%, #d9b45a, #6e4e17); border-color: #2a2622; }
+  .v4 .tape { position: absolute; left: 22%; right: 22%; top: 50%; height: 10px; transform: translateY(-50%);
+    background: linear-gradient(180deg, #d9b45a, #7a5a1e); }
+  .v4 .screw { position: absolute; width: 8px; height: 8px; border-radius: 50%;
+    background: radial-gradient(circle at 38% 32%, #fff, #8b93a1); border: 1px solid #55606f; }
+
+  /* =================================================================
+     5 · CLEAR SHELL — transparent tech
+  ================================================================= */
+  .v5 { filter: drop-shadow(0 16px 26px rgba(0,0,0,.5)); }
+  .v5 .shell { position: absolute; inset: 0; border-radius: 16px; overflow: hidden;
+    border: 2px solid rgba(190,255,230,.55);
+    background: linear-gradient(180deg, rgba(150,240,210,.22), rgba(80,140,120,.12) 40%, rgba(20,40,32,.32));
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.35), inset 0 -10px 20px rgba(0,0,0,.35); }
+  .v5 .inner { position: absolute; inset: 8px; border-radius: 11px; border: 1px solid rgba(190,255,230,.25);
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 12px); }
+  .v5 .gear { position: absolute; border-radius: 50%; border: 2px dashed rgba(190,255,230,.4); }
+  .v5 .plate { position: absolute; left: 24px; right: 24px; top: 22px; height: 46px; border-radius: 7px;
+    background: rgba(240,255,250,.72); border: 1.5px solid rgba(20,60,48,.6); backdrop-filter: blur(2px); padding: 8px 12px; }
+  .v5 .title { font-weight: 800; font-size: 16px; color: #123c30; }
+  .v5 .window { position: absolute; left: 54px; right: 54px; top: 112px; height: 64px; border-radius: 10px;
+    background: rgba(8,20,16,.5); border: 2px solid rgba(190,255,230,.5); box-shadow: inset 0 2px 8px rgba(0,0,0,.6);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .v5 .reel .teeth { background: repeating-conic-gradient(rgba(230,255,246,.85) 0 14deg, rgba(60,120,100,.7) 14deg 30deg); }
+  .v5 .reel .hub { background: radial-gradient(circle at 40% 34%, #bfeee0, #2c6a59); border-color: rgba(20,60,48,.7); }
+  .v5 .tape { position: absolute; left: 24%; right: 24%; top: 50%; height: 9px; transform: translateY(-50%);
+    background: linear-gradient(180deg, #7ad0b6, #2e6a58); }
+  .v5 .screw { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: rgba(190,255,230,.5); border: 1px solid rgba(20,60,48,.6); }
+</style>
+
+<header>
+  <h1>CASSD · Cassette Design Lab</h1>
+  <p class="sub">Top row = the build from your texture guide (front-facing with subtle depth, body recolors per shelf). Older explorations are kept below for reference.</p>
+</header>
+
+<!-- ==================== THE BUILD: from your texture guide ==================== -->
+<style>
+  .r3 { width: 340px; height: 214px; position: relative; }
+  .r3 .shell { position: absolute; inset: 0; border-radius: 13px; background: var(--c);
+    border: 2px solid color-mix(in srgb, var(--c), #000 58%);
+    box-shadow:
+      inset 0 3px 0 color-mix(in srgb, var(--c), #fff 26%),
+      inset -4px 0 0 color-mix(in srgb, var(--c), #000 14%),
+      inset 0 -6px 0 color-mix(in srgb, var(--c), #000 26%),
+      0 8px 0 color-mix(in srgb, var(--c), #000 50%),
+      0 18px 24px rgba(0,0,0,.35);
+    overflow: hidden; }
+  .r3 .ribs { position: absolute; left: 0; right: 0; bottom: 0; height: 52%; pointer-events: none;
+    background: repeating-linear-gradient(0deg, color-mix(in srgb, var(--c), #000 18%) 0 1px, transparent 1px 6px); opacity: .55; }
+  .r3 .label { position: absolute; left: 16px; right: 16px; top: 14px; height: 86px; background: #F6F0E8;
+    border: 1.5px solid color-mix(in srgb, var(--c), #000 45%); border-radius: 7px; box-shadow: 0 2px 3px rgba(0,0,0,.22); }
+  .r3 .label .rule { position: absolute; left: 12px; right: 12px; top: 26px; height: 1.5px; background: rgba(22,20,15,.26); }
+  .r3 .label .title { position: absolute; left: 12px; top: 8px; right: 12px; font-weight: 800; font-size: 14px; color: #16140F; }
+  .r3 .win { position: absolute; left: 64px; right: 64px; top: 72px; height: 58px; background: #1E1E1E; border-radius: 9px;
+    border: 1px solid #000; box-shadow: inset 0 2px 3px rgba(255,255,255,.12), 0 3px 6px rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 9px; }
+  .r3 .tape { position: absolute; left: 24%; right: 24%; top: 50%; height: 12px; transform: translateY(-50%); background: #3A2B22; z-index: 1;
+    border-top: 1px solid rgba(255,255,255,.08); border-bottom: 1px solid rgba(0,0,0,.4); }
+  .r3 .reel { position: relative; width: 46px; height: 46px; border-radius: 50%; background: #E6E6E6; border: 2px solid #c9c9c9; z-index: 2; }
+  .r3 .reel .teeth { position: absolute; inset: 13%; border-radius: 50%; background: repeating-conic-gradient(#1E1E1E 0 12deg, transparent 12deg 60deg); }
+  .r3 .reel .hole { position: absolute; inset: 33%; border-radius: 50%; background: #1E1E1E; border: 2px solid #E6E6E6; }
+  .r3 .glass { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 50px; height: 27px; border-radius: 4px; z-index: 3;
+    background: linear-gradient(180deg, rgba(70,70,70,.5), rgba(8,8,8,.55)); border: 1px solid #000; box-shadow: inset 0 1px 2px rgba(255,255,255,.15); }
+  .r3 .bottom { position: absolute; left: 50%; bottom: 15px; transform: translateX(-50%); width: 132px; height: 25px; background: #1E1E1E; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 13px; box-shadow: inset 0 2px 3px rgba(255,255,255,.1), 0 2px 4px rgba(0,0,0,.4); }
+  .r3 .bottom .rnd { width: 9px; height: 9px; border-radius: 50%; background: #000; box-shadow: inset 0 1px 1px rgba(255,255,255,.18); }
+  .r3 .bottom .sq { width: 8px; height: 8px; background: #000; }
+  .r3 .screw { position: absolute; width: 11px; height: 11px; border-radius: 50%;
+    background: radial-gradient(circle at 40% 34%, #3a3a3a, #0B0B0B); border: 1px solid #000; z-index: 4; }
+  .r3 .screw::before, .r3 .screw::after { content: ''; position: absolute; left: 50%; top: 50%; background: rgba(255,255,255,.22); }
+  .r3 .screw::before { width: 6px; height: 1.5px; transform: translate(-50%,-50%); }
+  .r3 .screw::after { width: 1.5px; height: 6px; transform: translate(-50%,-50%); }
+</style>
+
+<div class="grid">
+  <!-- BUILD · orange (guide) -->
+  <div class="card">
+    <div class="stage">
+      <div class="r3" style="--c:#FF4D1F">
+        <div class="shell">
+          <div class="ribs"></div>
+          <div class="label"><div class="title">Write the report</div><div class="rule"></div></div>
+          <div class="win">
+            <div class="tape"></div>
+            <div class="reel"><div class="teeth spin1"></div><div class="hole"></div></div>
+            <div class="glass"></div>
+            <div class="reel"><div class="teeth spin2"></div><div class="hole"></div></div>
+          </div>
+          <div class="bottom"><span class="rnd"></span><span class="sq"></span><span class="sq"></span><span class="rnd"></span></div>
+          <span class="screw" style="top:10px;left:11px"></span>
+          <span class="screw" style="top:10px;right:11px"></span>
+          <span class="screw" style="bottom:11px;left:11px"></span>
+          <span class="screw" style="bottom:11px;right:11px"></span>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">BUILD · WORK</div><div class="name">3D Model ★</div>
+      <p class="blurb">Straight from your guide. Exact parts: cream label, black window with white sprocket reels + tape + glass, ribbed body, bottom mechanism, metal screws. Body = shelf colour; subtle extruded depth.</p>
+    </div>
+  </div>
+
+  <!-- BUILD · blue -->
+  <div class="card">
+    <div class="stage">
+      <div class="r3" style="--c:#3D7BFF">
+        <div class="shell">
+          <div class="ribs"></div>
+          <div class="label"><div class="title">Call grandma</div><div class="rule"></div></div>
+          <div class="win">
+            <div class="tape"></div>
+            <div class="reel"><div class="teeth spin1"></div><div class="hole"></div></div>
+            <div class="glass"></div>
+            <div class="reel"><div class="teeth spin2"></div><div class="hole"></div></div>
+          </div>
+          <div class="bottom"><span class="rnd"></span><span class="sq"></span><span class="sq"></span><span class="rnd"></span></div>
+          <span class="screw" style="top:10px;left:11px"></span>
+          <span class="screw" style="top:10px;right:11px"></span>
+          <span class="screw" style="bottom:11px;left:11px"></span>
+          <span class="screw" style="bottom:11px;right:11px"></span>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">BUILD · LIFE</div><div class="name">3D Model</div>
+      <p class="blurb">Same model, blue shelf. Only the body and its shading recolor; label, window, reels and screws stay fixed.</p>
+    </div>
+  </div>
+
+  <!-- BUILD · teal -->
+  <div class="card">
+    <div class="stage">
+      <div class="r3" style="--c:#2BB3A3">
+        <div class="shell">
+          <div class="ribs"></div>
+          <div class="label"><div class="title">Morning run</div><div class="rule"></div></div>
+          <div class="win">
+            <div class="tape"></div>
+            <div class="reel"><div class="teeth spin1"></div><div class="hole"></div></div>
+            <div class="glass"></div>
+            <div class="reel"><div class="teeth spin2"></div><div class="hole"></div></div>
+          </div>
+          <div class="bottom"><span class="rnd"></span><span class="sq"></span><span class="sq"></span><span class="rnd"></span></div>
+          <span class="screw" style="top:10px;left:11px"></span>
+          <span class="screw" style="top:10px;right:11px"></span>
+          <span class="screw" style="bottom:11px;left:11px"></span>
+          <span class="screw" style="bottom:11px;right:11px"></span>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">BUILD · BODY</div><div class="name">3D Model</div>
+      <p class="blurb">Teal shelf. This is the one I would turn into the real Cassette.tsx once we lock the look.</p>
+    </div>
+  </div>
+</div>
+
+<header style="margin-top: 56px">
+  <h1 style="font-size: 24px; opacity: .8">Earlier explorations</h1>
+  <p class="sub">Kept for reference only.</p>
+</header>
+
+<div class="grid">
+
+  <!-- 1 -->
+  <div class="card">
+    <div class="stage">
+      <div class="cass v1">
+        <div class="shell"></div>
+        <span class="screw" style="top:8px;left:9px"></span>
+        <span class="screw" style="top:8px;right:9px"></span>
+        <span class="screw" style="bottom:8px;left:9px"></span>
+        <span class="screw" style="bottom:8px;right:9px"></span>
+        <div class="plate">
+          <div class="title">Write the report</div>
+          <div class="rule"></div>
+          <div class="hand">WORK · SIDE A &nbsp;|&nbsp; 00:00 — 45:00</div>
+        </div>
+        <div class="window">
+          <div class="tape"></div>
+          <div class="reel"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+          <div class="reel"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">01</div><div class="name">Studio Master</div>
+      <p class="blurb">Realistic skeuomorphic plastic — brushed-metal label plate, screws, glossy dark shell, precise reels. Premium & tactile.</p>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card">
+    <div class="stage">
+      <div class="cass v2">
+        <div class="shell">
+          <div class="sun"></div>
+          <div class="grid-bg"></div>
+        </div>
+        <div class="plate"><div class="title">WRITE THE REPORT</div></div>
+        <div class="window">
+          <div class="tape"></div>
+          <div class="reel"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+          <div class="reel"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">02</div><div class="name">Neon Nights</div>
+      <p class="blurb">Synthwave — dark shell, glowing pink/cyan outline, retro sun + perspective grid, neon reels. Loud and moody.</p>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card">
+    <div class="stage">
+      <div class="cass v3">
+        <div class="shell"><div class="dots"></div></div>
+        <div class="plate">
+          <div class="title">Write the report</div>
+          <div class="doodle">★ do it now · WORK</div>
+        </div>
+        <span class="washi" style="top:14px;left:40px;transform:rotate(-8deg)"></span>
+        <span class="washi" style="top:96px;right:52px;transform:rotate(6deg);background:repeating-linear-gradient(45deg,#3D7BFF 0 6px,#2f61cc 6px 12px)"></span>
+        <div class="badge">↻</div>
+        <div class="window">
+          <div class="tape"></div>
+          <div class="reel"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+          <div class="reel"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">03</div><div class="name">Sticker Bomb</div>
+      <p class="blurb">The cool evolution of today’s sticker tape — bold outline, tilted label, washi-tape strips, halftone dots, chunky habit badge.</p>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <div class="stage">
+      <div class="cass v4">
+        <div class="shell"><div class="holo"></div></div>
+        <span class="screw" style="top:9px;left:10px"></span>
+        <span class="screw" style="top:9px;right:10px"></span>
+        <span class="screw" style="bottom:9px;left:10px"></span>
+        <span class="screw" style="bottom:9px;right:10px"></span>
+        <div class="plate">
+          <div class="title">WRITE THE REPORT</div>
+          <div class="emboss">WORK · HI-FI · SIDE A</div>
+        </div>
+        <div class="window">
+          <div class="tape"></div>
+          <div class="reel"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+          <div class="reel"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">04</div><div class="name">Chrome Foil</div>
+      <p class="blurb">Premium — brushed metal / holographic shell, gold foil title on a black plate, chrome reels. Feels like a collector’s edition.</p>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <div class="stage">
+      <div class="cass v5">
+        <div class="shell">
+          <div class="inner"></div>
+          <span class="gear" style="width:40px;height:40px;top:60px;left:30px"></span>
+          <span class="gear" style="width:28px;height:28px;bottom:20px;right:36px"></span>
+        </div>
+        <span class="screw" style="top:9px;left:10px"></span>
+        <span class="screw" style="top:9px;right:10px"></span>
+        <span class="screw" style="bottom:9px;left:10px"></span>
+        <span class="screw" style="bottom:9px;right:10px"></span>
+        <div class="plate"><div class="title">Write the report</div></div>
+        <div class="window">
+          <div class="tape"></div>
+          <div class="reel"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+          <div class="reel"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">05</div><div class="name">Clear Shell</div>
+      <p class="blurb">Transparent tinted plastic — you see the mechanism through the shell, frosted label, techy vibe. Matches the app’s mint/teal palette.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== THE MIX: 01 x 03 ==================== -->
+<style>
+  /* shared: shell recolors per shelf via --c */
+  .mix .shell { position: absolute; inset: 0; border-radius: 16px; border: 3px solid var(--ink); overflow: hidden; }
+  .mix .screw { position: absolute; width: 8px; height: 8px; border-radius: 50%; }
+  .mix .window { position: absolute; left: 58px; right: 58px; top: 114px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  .mix .badge { position: absolute; top: -9px; right: 14px; width: 32px; height: 32px; border-radius: 50%;
+    background: #FFD23F; border: 3px solid var(--ink); display: grid; place-items: center; font-weight: 800; color: var(--ink);
+    transform: rotate(9deg); box-shadow: 2px 2px 0 var(--ink); }
+
+  /* --- MIX A · Tactile Sticker (playful-leaning) --- */
+  .mA .shell {
+    background:
+      radial-gradient(120% 55% at 50% -8%, rgba(255,255,255,.30), transparent 62%),
+      linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 30%, rgba(0,0,0,.24)),
+      var(--c);
+    box-shadow: 6px 7px 0 var(--ink), 0 16px 22px rgba(0,0,0,.32), inset 3px 0 0 rgba(255,255,255,.14), inset -3px 0 0 rgba(0,0,0,.16);
+  }
+  .mA .dots { position: absolute; inset: 0; opacity: .10; background: radial-gradient(circle, #16140F 1.3px, transparent 1.5px) 0 0 / 13px 13px; }
+  .mA .screw { background: radial-gradient(circle at 38% 32%, rgba(255,255,255,.55), rgba(13,12,9,.92)); border: 1px solid rgba(0,0,0,.4); }
+  .mA .plate { position: absolute; left: 20px; right: 20px; top: 20px; height: 78px; border-radius: 7px;
+    background: linear-gradient(180deg, #fbf5e7, #efe6d2); border: 2.5px solid var(--ink); transform: rotate(-1.4deg);
+    box-shadow: 3px 3px 0 rgba(22,20,15,.22), inset 0 1px 0 rgba(255,255,255,.7); padding: 8px 11px; }
+  .mA .title { font-weight: 800; font-size: 16px; color: var(--ink); }
+  .mA .rule { height: 2px; background: repeating-linear-gradient(90deg, rgba(22,20,15,.35) 0 6px, transparent 6px 11px); margin: 6px 0; }
+  .mA .hand { font-family: 'Space Mono', monospace; font-size: 10.5px; font-weight: 700; color: #7a5d3a; letter-spacing: .05em; }
+  .mA .washi { position: absolute; top: 11px; right: 42px; width: 44px; height: 15px;
+    background: repeating-linear-gradient(45deg, #2bb3a3 0 6px, #22998c 6px 12px); border: 2px solid var(--ink); transform: rotate(8deg); }
+  .mA .window { border-radius: 999px; background: radial-gradient(120% 140% at 50% -10%, #2a2620, #0b0a08); border: 3px solid var(--ink); box-shadow: inset 0 3px 7px rgba(0,0,0,.8); }
+  .mA .tape { position: absolute; left: 26%; right: 26%; top: 50%; height: 9px; transform: translateY(-50%);
+    background: linear-gradient(180deg, #6a5540, #3a2c1e); border-top: 1px solid rgba(255,255,255,.18); }
+
+  /* --- MIX B · Deck Grade (premium-leaning) --- */
+  .mB .shell {
+    background:
+      linear-gradient(120deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,.05) 20%, rgba(255,255,255,0) 42%),
+      linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 34%, rgba(0,0,0,.34)),
+      var(--c);
+    box-shadow: 4px 5px 0 var(--ink), 0 18px 26px rgba(0,0,0,.4), inset 0 2px 0 rgba(255,255,255,.28), inset -3px 0 0 rgba(0,0,0,.2);
+  }
+  .mB .screw { background: radial-gradient(circle at 38% 32%, #fff, #8b93a1); border: 1px solid #33373d; }
+  .mB .plate { position: absolute; left: 22px; right: 22px; top: 22px; height: 76px; border-radius: 8px;
+    background: linear-gradient(180deg, #211d17, #0b0a08); border: 2.5px solid var(--ink);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 3px 6px rgba(0,0,0,.4); padding: 9px 13px; }
+  .mB .title { font-family: Anton, sans-serif; font-size: 17px; letter-spacing: .05em; color: #F5EAD8; }
+  .mB .emboss { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: .16em; color: var(--c); filter: brightness(1.3); margin-top: 6px; }
+  .mB .window { border-radius: 9px; background: linear-gradient(180deg, #1a1720, #05040a); border: 3px solid var(--ink); box-shadow: inset 0 2px 6px rgba(0,0,0,.85); }
+  .mB .reel .teeth { background: repeating-conic-gradient(#e8ebf1 0 14deg, #9aa2b1 14deg 30deg); }
+  .mB .reel .hub { background: radial-gradient(circle at 40% 34%, #d9b45a, #6e4e17); border-color: var(--ink); }
+  .mB .tape { position: absolute; left: 22%; right: 22%; top: 50%; height: 10px; transform: translateY(-50%); background: linear-gradient(180deg, #d9b45a, #7a5a1e); }
+</style>
+
+<header style="margin-top: 64px">
+  <h1 style="font-size: 26px">The mix · Studio × Sticker</h1>
+  <p class="sub">Both keep the app’s bold black outline, hard offset shadow, detailed spinning reels and chunky habit badge. <b>A</b> leans playful (cream tilted label, washi tape, halftone). <b>B</b> leans premium (smoked label plate, foil title, chrome reels). Shell recolors per shelf. Pick one, or tell me to nudge the ratio.</p>
+</header>
+
+<div class="grid">
+  <!-- MIX A -->
+  <div class="card">
+    <div class="stage">
+      <div class="cass mix mA" style="--c:#FF5C28">
+        <div class="shell"><div class="dots"></div></div>
+        <span class="screw" style="top:9px;left:10px"></span>
+        <span class="screw" style="top:9px;right:10px"></span>
+        <span class="screw" style="bottom:9px;left:10px"></span>
+        <span class="screw" style="bottom:9px;right:10px"></span>
+        <div class="plate">
+          <div class="title">Write the report</div>
+          <div class="rule"></div>
+          <div class="hand">WORK · SIDE A</div>
+        </div>
+        <span class="washi"></span>
+        <div class="badge">↻</div>
+        <div class="window">
+          <div class="tape"></div>
+          <div class="reel"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+          <div class="reel"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">MIX A</div><div class="name">Tactile Sticker</div>
+      <p class="blurb">On-brand and 3D: glossy coloured shell, hard shadow, screws, tilted cream label, washi tape, real reels, habit badge.</p>
+    </div>
+  </div>
+
+  <!-- MIX B -->
+  <div class="card">
+    <div class="stage">
+      <div class="cass mix mB" style="--c:#FF5C28">
+        <div class="shell"></div>
+        <span class="screw" style="top:9px;left:10px"></span>
+        <span class="screw" style="top:9px;right:10px"></span>
+        <span class="screw" style="bottom:9px;left:10px"></span>
+        <span class="screw" style="bottom:9px;right:10px"></span>
+        <div class="plate">
+          <div class="title">WRITE THE REPORT</div>
+          <div class="emboss">WORK · SIDE A</div>
+        </div>
+        <div class="badge">↻</div>
+        <div class="window">
+          <div class="tape"></div>
+          <div class="reel"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+          <div class="reel"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"><span class="spoke"></span><span class="spoke" style="transform:translate(-50%) rotate(120deg)"></span><span class="spoke" style="transform:translate(-50%) rotate(240deg)"></span></div><div class="hub"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">MIX B</div><div class="name">Deck Grade</div>
+      <p class="blurb">Premium take: glossy shell, smoked label plate with a foil-tone title, chrome + gold reels, screws, habit badge.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MATCHED TO YOUR REFERENCES ==================== -->
+<style>
+  .ref { width: 340px; height: 214px; position: relative; }
+
+  /* ---------- REF · FLAT DECK  (your favourite, #2) — accents derive from the shelf colour --c ---------- */
+  .fd .body { position: absolute; inset: 0; border-radius: 14px; background: var(--c); border: 3px solid #16140F;
+    box-shadow: 0 7px 0 color-mix(in srgb, var(--c), #000 48%), 9px 13px 0 rgba(0,0,0,.16), 0 20px 26px rgba(0,0,0,.3); }
+  .fd .label { position: absolute; left: 14px; right: 14px; top: 13px; height: 118px; background: #F4F1E4;
+    border: 3px solid #16140F; border-radius: 6px; overflow: hidden; }
+  .fd .rblock { position: absolute; top: 0; bottom: 0; right: 0; width: 24%; background: color-mix(in srgb, var(--c), #000 20%); }
+  .fd .stripe { position: absolute; left: 0; right: 0; height: 5px; background: color-mix(in srgb, var(--c), #000 20%); }
+  .fd .title { position: absolute; left: 12px; top: 30px; right: 30%; font-weight: 800; font-size: 15px; color: #16140F; line-height: 1.12; }
+  .fd .reel { position: absolute; top: 60px; width: 54px; height: 54px; border-radius: 50%; background: #F4F1E4; border: 3px solid #16140F; }
+  .fd .reel.l { left: 40px; } .fd .reel.r { right: 40px; }
+  .fd .reel .hub { position: absolute; inset: 26%; border-radius: 50%; background: var(--c); border: 2.5px solid #16140F; }
+  .fd .win { position: absolute; left: 50%; top: 74px; transform: translateX(-50%); width: 58px; height: 27px; border-radius: 5px;
+    background: #16140F; border: 2px solid #16140F; }
+  .fd .win::after { content: ''; position: absolute; left: 8px; right: 8px; top: 50%; height: 8px; transform: translateY(-50%); background: #7A4A22; border-radius: 2px; }
+  .fd .mech { position: absolute; left: 40px; right: 40px; bottom: 12px; height: 30px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .fd .cut { width: 20px; height: 22px; background: #16140F; border-radius: 3px; }
+  .fd .holes { position: absolute; left: 24px; right: 24px; bottom: 8px; display: flex; justify-content: space-between; }
+  .fd .holes i { width: 6px; height: 6px; border-radius: 50%; background: #16140F; }
+  .fd .screw { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: radial-gradient(circle at 40% 34%, rgba(255,255,255,.5), #16140F); border: 1px solid #16140F; }
+
+  /* ---------- REF · INKED  (comic illustration, #1) ---------- */
+  .ik .body { position: absolute; inset: 0; border-radius: 16px 20px 16px 18px; background: #23201c; border: 3.5px solid #0d0c09;
+    box-shadow: 6px 8px 0 #0d0c09, 0 18px 26px rgba(0,0,0,.4); overflow: hidden; }
+  .ik .dots { position: absolute; inset: 0; opacity: .16; background: radial-gradient(circle, #f4efe3 1.1px, transparent 1.4px) 0 0 / 11px 11px; }
+  .ik .band { position: absolute; top: -20px; bottom: -20px; width: 20px; transform: rotate(14deg); }
+  .ik .label { position: absolute; left: 96px; right: 18px; top: 20px; height: 118px; background: #f4efe3; border: 3px solid #0d0c09;
+    border-radius: 4px; overflow: hidden; }
+  .ik .label .l { position: absolute; left: 10px; right: 10px; height: 2px; background: rgba(13,12,9,.5); }
+  .ik .title { position: absolute; left: 104px; top: 26px; font-weight: 800; font-size: 14px; color: #16140F; z-index: 2; }
+  .ik .abadge { position: absolute; top: 22px; left: 26px; width: 30px; height: 30px; background: #E8412B; border: 3px solid #0d0c09;
+    border-radius: 5px; display: grid; place-items: center; font-family: Anton, sans-serif; color: #fff; font-size: 18px; }
+  .ik .reel { position: absolute; top: 62px; width: 52px; height: 52px; border-radius: 50%; background: #f4efe3; border: 3px solid #0d0c09; z-index: 2; }
+  .ik .reel.l { left: 108px; } .ik .reel.r { right: 34px; }
+  .ik .reel .teeth { position: absolute; inset: 4px; border-radius: 50%; background: repeating-conic-gradient(#0d0c09 0 12deg, transparent 12deg 30deg); -webkit-mask: radial-gradient(circle, transparent 40%, #000 42%); mask: radial-gradient(circle, transparent 40%, #000 42%); }
+  .ik .reel .hub { position: absolute; inset: 34%; border-radius: 50%; background: #0d0c09; }
+  .ik .win { position: absolute; left: 50%; top: 78px; transform: translateX(-50%); width: 46px; height: 24px; background: #3a5c50; border: 3px solid #0d0c09; border-radius: 4px; z-index: 2; }
+
+  /* ---------- REF · CLASSIC  (real RCA-style, #3) ---------- */
+  .cl .body { position: absolute; inset: 0; border-radius: 12px; background: linear-gradient(180deg, #eceae2, #d9d6cb); border: 2px solid #b7b3a6;
+    box-shadow: 0 14px 24px rgba(0,0,0,.3), inset 0 2px 0 rgba(255,255,255,.8); }
+  .cl .band { position: absolute; left: 16px; right: 16px; top: 22px; height: 108px; background: linear-gradient(180deg, #f0872a, #e0742a); border-radius: 4px; overflow: hidden; }
+  .cl .logo { position: absolute; left: 8px; top: 8px; font-family: Anton, sans-serif; font-size: 20px; color: #fff; letter-spacing: .04em; }
+  .cl .title { position: absolute; left: 54px; top: 9px; font-weight: 800; font-size: 13px; color: #fff; }
+  .cl .tracks { position: absolute; left: 54px; top: 30px; right: 44px; font-family: 'Space Mono', monospace; font-size: 8px; line-height: 1.5; color: rgba(255,255,255,.92); }
+  .cl .side { position: absolute; right: 8px; top: 8px; font-family: Anton, sans-serif; font-size: 18px; color: #fff; }
+  .cl .win { position: absolute; left: 50%; top: 60px; transform: translateX(-50%); width: 56px; height: 22px; background: #1a1712; border-radius: 3px; }
+  .cl .reel { position: absolute; top: 48px; width: 44px; height: 44px; border-radius: 50%; background: #1a1712; border: 3px solid #2a2620; }
+  .cl .reel.l { left: 40px; } .cl .reel.r { right: 40px; }
+  .cl .reel .hub { position: absolute; inset: 30%; border-radius: 50%; background: repeating-conic-gradient(#5a5348 0 30deg, #2a2620 30deg 60deg); }
+  .cl .holes { position: absolute; left: 30px; right: 30px; bottom: 14px; display: flex; justify-content: space-between; }
+  .cl .holes i { width: 7px; height: 7px; border-radius: 50%; background: #b7b3a6; box-shadow: inset 0 1px 2px rgba(0,0,0,.5); }
+</style>
+
+<header style="margin-top: 64px">
+  <h1 style="font-size: 26px">Matched to your references</h1>
+  <p class="sub">Same task, three looks pulled straight from the tapes you sent. <b>Flat Deck</b> is your favourite (#2). All keep the app’s heavy outline; Flat Deck &amp; Classic recolor the shell per shelf.</p>
+</header>
+
+<div class="grid">
+  <!-- FLAT DECK (#2) — recolored per shelf, accents derived from the shell -->
+  <div class="card">
+    <div class="stage">
+      <div class="ref fd" style="--c:#FF5C28">
+        <div class="body">
+          <div class="label">
+            <div class="rblock"></div>
+            <div class="stripe" style="top:12px"></div>
+            <div class="stripe" style="top:21px;height:3px"></div>
+            <div class="title">Write the report</div>
+          </div>
+          <div class="reel l"><div class="spin1" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="reel r"><div class="spin2" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="win"></div>
+          <div class="mech"><span class="cut"></span><span class="cut"></span></div>
+          <div class="holes"><i></i><i></i><i></i><i></i></div>
+          <span class="screw" style="top:9px;left:10px"></span>
+          <span class="screw" style="top:9px;right:10px"></span>
+          <span class="screw" style="bottom:9px;left:10px"></span>
+          <span class="screw" style="bottom:9px;right:10px"></span>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">REF · #2 ★</div><div class="name">Flat Deck · Work</div>
+      <p class="blurb">Your favourite. Bold flat vector; shell = shelf colour, stripes &amp; reel hubs derived from it. Same tape below in two more shelf colours.</p>
+    </div>
+  </div>
+
+  <!-- FLAT DECK · blue -->
+  <div class="card">
+    <div class="stage">
+      <div class="ref fd" style="--c:#3D7BFF">
+        <div class="body">
+          <div class="label">
+            <div class="rblock"></div>
+            <div class="stripe" style="top:12px"></div>
+            <div class="stripe" style="top:21px;height:3px"></div>
+            <div class="title">Call grandma</div>
+          </div>
+          <div class="reel l"><div class="spin1" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="reel r"><div class="spin2" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="win"></div>
+          <div class="mech"><span class="cut"></span><span class="cut"></span></div>
+          <div class="holes"><i></i><i></i><i></i><i></i></div>
+          <span class="screw" style="top:9px;left:10px"></span>
+          <span class="screw" style="top:9px;right:10px"></span>
+          <span class="screw" style="bottom:9px;left:10px"></span>
+          <span class="screw" style="bottom:9px;right:10px"></span>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">REF · #2</div><div class="name">Flat Deck · Life</div>
+      <p class="blurb">Same design, blue shelf. Notice the stripes and hubs shift with the shell automatically.</p>
+    </div>
+  </div>
+
+  <!-- FLAT DECK · teal (matches the reference) -->
+  <div class="card">
+    <div class="stage">
+      <div class="ref fd" style="--c:#2C93B5">
+        <div class="body">
+          <div class="label">
+            <div class="rblock"></div>
+            <div class="stripe" style="top:12px"></div>
+            <div class="stripe" style="top:21px;height:3px"></div>
+            <div class="title">Morning run</div>
+          </div>
+          <div class="reel l"><div class="spin1" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="reel r"><div class="spin2" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="win"></div>
+          <div class="mech"><span class="cut"></span><span class="cut"></span></div>
+          <div class="holes"><i></i><i></i><i></i><i></i></div>
+          <span class="screw" style="top:9px;left:10px"></span>
+          <span class="screw" style="top:9px;right:10px"></span>
+          <span class="screw" style="bottom:9px;left:10px"></span>
+          <span class="screw" style="bottom:9px;right:10px"></span>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">REF · #2</div><div class="name">Flat Deck · Body</div>
+      <p class="blurb">Teal shelf, closest to your reference photo. Red-ish stripe reads because it is a darker shade of the teal shell.</p>
+    </div>
+  </div>
+
+  <!-- INKED (#1) -->
+  <div class="card">
+    <div class="stage">
+      <div class="ref ik">
+        <div class="body">
+          <div class="dots"></div>
+          <div class="band" style="left:60px;background:#E8412B"></div>
+          <div class="band" style="left:74px;background:#F2762E"></div>
+          <div class="band" style="left:88px;background:#FFD23F"></div>
+          <div class="label">
+            <div class="l" style="top:52px"></div><div class="l" style="top:64px"></div>
+            <div class="l" style="top:76px"></div><div class="l" style="top:88px"></div>
+          </div>
+          <div class="abadge">A</div>
+          <div class="title">Write the report</div>
+          <div class="reel l"><div class="teeth"></div><div class="spin1" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="reel r"><div class="teeth"></div><div class="spin2" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="win"></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">REF · #1</div><div class="name">Inked</div>
+      <p class="blurb">Comic-illustration vibe — black shell, diagonal pink/orange/yellow racing stripes, “A” badge, ruled paper label, halftone, hand-inked outline.</p>
+    </div>
+  </div>
+
+  <!-- CLASSIC (#3) -->
+  <div class="card">
+    <div class="stage">
+      <div class="ref cl" style="--c:#e0742a">
+        <div class="body">
+          <div class="band">
+            <div class="logo">CΛSSD</div>
+            <div class="side">A</div>
+            <div class="title">Write the report</div>
+            <div class="tracks">1. draft the outline&nbsp; 2. first pass<br>3. edit &amp; polish&nbsp; 4. send it off</div>
+          </div>
+          <div class="reel l"><div class="spin1" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="reel r"><div class="spin2" style="position:absolute;inset:0"></div><div class="hub"></div></div>
+          <div class="win"></div>
+          <div class="holes"><i></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="num">REF · #3</div><div class="name">Classic</div>
+      <p class="blurb">Real-tape realism — cream shell, orange label band with a logo, side letter, mono tracklist, dark reel hubs, capstan holes.</p>
+    </div>
+  </div>
+</div>
