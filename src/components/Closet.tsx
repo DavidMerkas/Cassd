@@ -110,16 +110,16 @@ export default function Closet({
         boxShadow: '0 16px 30px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.22)',
         overflow: 'hidden',
       }}>
-        {/* crown molding */}
-        <div style={{ height: 15, margin: '0 -9px', background: `${grainH}, ${cb.board}`, borderBottom: '2px solid #16140F', boxShadow: 'inset 0 3px 0 rgba(255,255,255,0.24), 0 4px 7px rgba(0,0,0,0.3)' }} />
+        {/* crown molding — profiled: lit top lip, shaded underside */}
+        <div style={{ height: 16, margin: '0 -9px', background: `linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.06) 42%, rgba(0,0,0,0.24)), ${grainH}, ${cb.board}`, borderBottom: '2px solid #16140F', boxShadow: 'inset 0 3px 0 rgba(255,255,255,0.26), 0 5px 8px rgba(0,0,0,0.34)' }} />
 
-        {/* recessed interior */}
-        <div style={{ position: 'relative', margin: '9px 0', background: cb.back, borderRadius: 7, border: '2px solid rgba(0,0,0,0.34)', boxShadow: 'inset 0 11px 16px rgba(0,0,0,0.32), inset 0 -5px 11px rgba(0,0,0,0.22)', overflow: 'hidden' }}>
+        {/* recessed interior — darker toward the side walls for depth */}
+        <div style={{ position: 'relative', margin: '9px 0', background: cb.back, borderRadius: 7, border: '2px solid rgba(0,0,0,0.34)', boxShadow: 'inset 0 12px 18px rgba(0,0,0,0.34), inset 0 -5px 11px rgba(0,0,0,0.22), inset 14px 0 18px rgba(0,0,0,0.16), inset -14px 0 18px rgba(0,0,0,0.16)', overflow: 'hidden' }}>
           {/* beadboard planks on the back wall */}
           <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0 1.5px, rgba(255,255,255,0.03) 1.5px 3px, transparent 3px 28px)', pointerEvents: 'none' }} />
-          {/* side posts framing the interior */}
-          <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 7, background: `${grainV}, ${cb.frame}`, boxShadow: '3px 0 7px rgba(0,0,0,0.34)' }} />
-          <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: 7, background: `${grainV}, ${cb.frame}`, boxShadow: '-3px 0 7px rgba(0,0,0,0.34)' }} />
+          {/* side posts framing the interior — lit inner edge so they read as rounded uprights */}
+          <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 9, background: `${grainV}, ${cb.frame}`, boxShadow: 'inset -2px 0 0 rgba(255,255,255,0.2), inset 2px 0 0 rgba(0,0,0,0.25), 4px 0 8px rgba(0,0,0,0.36)' }} />
+          <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: 9, background: `${grainV}, ${cb.frame}`, boxShadow: 'inset 2px 0 0 rgba(255,255,255,0.2), inset -2px 0 0 rgba(0,0,0,0.25), -4px 0 8px rgba(0,0,0,0.36)' }} />
 
           {sections.map(({ shelf, items }) => (
             <div key={shelf.id} style={{ position: 'relative', padding: '9px 13px 0' }}>
@@ -188,11 +188,11 @@ export default function Closet({
                 ))}
               </div>
 
-              {/* shelf board — chunky grained plank, click to rename too */}
-              <div
-                onClick={() => startEdit(shelf)}
-                style={{ height: 18, margin: '1px 2px 0', borderRadius: '2px 2px 6px 6px', cursor: 'pointer', background: `${grainH}, ${cb.board}`, borderTop: '1px solid rgba(255,255,255,0.24)', boxShadow: '0 11px 14px rgba(0,0,0,0.38), inset 0 3px 0 rgba(255,255,255,0.34), inset 0 -4px 6px rgba(0,0,0,0.44)' }}
-              />
+              {/* shelf board — 3D plank: lit top surface receding back + grained front edge; click to rename too */}
+              <div onClick={() => startEdit(shelf)} style={{ margin: '1px 2px 0', cursor: 'pointer' }}>
+                <div style={{ height: 6, background: `linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.14)), ${grainH}, ${cb.board}`, clipPath: 'polygon(7px 0, calc(100% - 7px) 0, 100% 100%, 0 100%)' }} />
+                <div style={{ height: 13, borderRadius: '0 0 6px 6px', background: `${grainH}, ${cb.board}`, borderTop: '1.5px solid rgba(0,0,0,0.35)', boxShadow: '0 11px 14px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.18), inset 0 -4px 6px rgba(0,0,0,0.46)' }} />
+              </div>
             </div>
           ))}
 

@@ -148,8 +148,8 @@ export default function Boombox({
                 position: 'absolute', left: '50%', bottom: -INSERT_DEPTH, marginLeft: -CASS_W / 2,
                 cursor: 'grab', touchAction: 'none', userSelect: 'none', pointerEvents: 'auto',
                 filter: `drop-shadow(0 4px 6px rgba(0,0,0,0.45))${armed ? ' drop-shadow(0 10px 12px rgba(0,0,0,0.4))' : ''}`,
-                transform: armed ? 'translateY(-62px)' : 'translateY(0)',
-                transition: 'transform .32s cubic-bezier(.22,1,.36,1)',
+                transform: armed ? 'translateY(-84px) rotate(-4deg)' : 'translateY(0) rotate(0deg)',
+                transition: 'transform .34s cubic-bezier(.22,1,.36,1)',
                 animation: 'cassd-dock .34s cubic-bezier(.22,1,.36,1)',
               }}
             >
