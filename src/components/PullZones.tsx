@@ -13,9 +13,11 @@ interface Props {
   onCrate?: () => void
 }
 
-// wood grain, matching the closet's procedural texture
+// painted-metal locker surfaces, matching the closet
+const metalFace = 'linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 15%, rgba(0,0,0,0.09) 56%, rgba(255,255,255,0.05) 94%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px)'
+const louver = 'repeating-linear-gradient(180deg, rgba(255,255,255,0.28) 0 1px, rgba(0,0,0,0.12) 1px 5px, rgba(0,0,0,0.6) 5px 6px)'
+// crate wood stays wood
 const grainH = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 4px), repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 8px), repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 13px)'
-const grainV = 'repeating-linear-gradient(90deg, rgba(0,0,0,0.055) 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 7px), repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 12px)'
 
 const railBase: CSSProperties = {
   position: 'absolute', top: '44%', zIndex: 60, width: 112, height: 190,
@@ -35,26 +37,26 @@ export default function PullZones({ active, cb, habit, interactive = false, onSh
           ...railBase, left: 0,
           pointerEvents: interactive ? 'auto' : 'none',
           cursor: interactive ? 'pointer' : 'default',
-          background: `${grainH}, ${cb.frame}`,
+          background: `${metalFace}, ${cb.frame}`,
           border: '3px solid #16140F', borderLeft: 'none',
-          borderRadius: '0 14px 14px 0',
+          borderRadius: '0 12px 12px 0',
           color: '#F5EAD8',
           transform: `translate(${active === 'shelf' ? '0' : '-30px'}, -50%)`,
           filter: active === 'shelf' ? 'brightness(1.08)' : 'brightness(0.94)',
           boxShadow: active === 'shelf'
-            ? '10px 6px 26px rgba(0,0,0,0.42), inset 0 3px 0 rgba(255,255,255,0.22)'
-            : '5px 4px 14px rgba(0,0,0,0.3), inset 0 3px 0 rgba(255,255,255,0.18)',
+            ? '10px 6px 26px rgba(0,0,0,0.42), inset 0 3px 0 rgba(255,255,255,0.24)'
+            : '5px 4px 14px rgba(0,0,0,0.3), inset 0 3px 0 rgba(255,255,255,0.2)',
           padding: 0, overflow: 'hidden',
         }}
       >
-        {/* crown + plinth strips */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 10, background: `${grainH}, ${cb.board}`, borderBottom: '2px solid #16140F', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.22)' }} />
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 9, background: `${grainH}, ${cb.board}`, borderTop: '2px solid #16140F' }} />
+        {/* top + bottom vent strips */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 10, background: `${louver}, ${cb.frame}`, borderBottom: '2px solid #16140F' }} />
+        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 9, background: `${louver}, ${cb.frame}`, borderTop: '2px solid #16140F' }} />
 
         {/* dark interior peeking through the seam */}
-        <div style={{ position: 'absolute', inset: '12px 5px 11px 0', background: 'linear-gradient(180deg, #241a10, #16100a)' }} />
+        <div style={{ position: 'absolute', inset: '12px 5px 11px 0', background: 'linear-gradient(180deg, #2c2e28, #171815)' }} />
 
-        {/* the two doors, hinged at the outer edges */}
+        {/* the two metal doors, hinged at the outer edges */}
         <div style={{ position: 'absolute', inset: '12px 5px 11px 0', perspective: 420 }}>
           {[0, 1].map(side => (
             <div
@@ -63,15 +65,18 @@ export default function PullZones({ active, cb, habit, interactive = false, onSh
                 position: 'absolute', top: 0, bottom: 0,
                 [side === 0 ? 'left' : 'right']: 0, width: '50%',
                 transformOrigin: side === 0 ? 'left center' : 'right center',
-                transform: active === 'shelf' ? `rotateY(${side === 0 ? -24 : 24}deg)` : 'rotateY(0deg)',
+                transform: active === 'shelf' ? `rotateY(${side === 0 ? -26 : 26}deg)` : 'rotateY(0deg)',
                 transition: 'transform .2s cubic-bezier(.22,1,.36,1)',
-                background: `${grainV}, ${cb.board}`,
+                background: `${metalFace}, ${cb.frame}`,
                 border: '2px solid #16140F',
-                boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.16)',
+                boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.18)',
               } as CSSProperties}
             >
-              <div style={{ position: 'absolute', inset: 7, borderRadius: 3, border: '1.5px solid rgba(0,0,0,0.3)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.24), inset 0 -1px 0 rgba(255,255,255,0.14)' }} />
-              <div style={{ position: 'absolute', [side === 0 ? 'right' : 'left']: 5, top: '50%', width: 6, height: 6, borderRadius: '50%', background: '#16140F', transform: 'translateY(-50%)' } as CSSProperties} />
+              {/* vent louvers */}
+              <div style={{ position: 'absolute', top: 8, left: 6, right: 6, height: 14, background: louver, border: '1px solid #16140F', borderRadius: 2 }} />
+              <div style={{ position: 'absolute', bottom: 8, left: 6, right: 6, height: 14, background: louver, border: '1px solid #16140F', borderRadius: 2 }} />
+              {/* chrome latch by the seam */}
+              <div style={{ position: 'absolute', [side === 0 ? 'right' : 'left']: 4, top: '50%', width: 5, height: 24, borderRadius: 2, background: 'linear-gradient(90deg,#cfcfcf,#6a6a6a 52%,#a4a4a4)', border: '1px solid #16140F', transform: 'translateY(-50%)' } as CSSProperties} />
             </div>
           ))}
         </div>

@@ -21,9 +21,26 @@ interface Props {
   goStudio: () => void
 }
 
-// procedural wood grain — layered incommensurate periods so it never looks tiled
-const grainV = 'repeating-linear-gradient(90deg, rgba(0,0,0,0.055) 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, transparent 1px 7px), repeating-linear-gradient(90deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 12px)'
-const grainH = 'repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 4px), repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 8px), repeating-linear-gradient(0deg, rgba(0,0,0,0.04) 0 2px, transparent 2px 13px)'
+// painted-metal locker surfaces (layered over a paint colour)
+const metalFace = 'linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0) 15%, rgba(0,0,0,0.09) 56%, rgba(255,255,255,0.05) 94%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px)'
+const louver = 'repeating-linear-gradient(180deg, rgba(255,255,255,0.28) 0 1px, rgba(0,0,0,0.12) 1px 5px, rgba(0,0,0,0.6) 5px 6px)'
+const brushV = 'repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 4px)'
+const INTERIOR = 'linear-gradient(180deg, #34362f, #1f201d)'
+
+// tint a paint hex toward black (amt<0) or white (amt>0)
+function shade(hex: string, amt: number): string {
+  let h = hex.replace('#', '')
+  if (h.length === 3) h = h.split('').map(c => c + c).join('')
+  const n = parseInt(h, 16)
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255
+  const t = amt < 0 ? 0 : 255, k = Math.abs(amt)
+  r = Math.round(r + (t - r) * k); g = Math.round(g + (t - g) * k); b = Math.round(b + (t - b) * k)
+  return `rgb(${r},${g},${b})`
+}
+
+function Rivet({ style }: { style: CSSProperties }) {
+  return <span style={{ position: 'absolute', width: 7, height: 7, borderRadius: '50%', background: 'radial-gradient(circle at 38% 30%, #d6d6d6, #4a4a4a)', border: '1px solid #16140F', zIndex: 4, ...style }} />
+}
 
 export default function Closet({
   shelfTasks, shelves, cb, ownedClosets, equippedCloset, drag,
@@ -42,6 +59,13 @@ export default function Closet({
   const sections = shelves.map(s => ({ shelf: s, items: shelfTasks.filter(t => t.shelfId === s.id) }))
   const empty = shelfTasks.length === 0
 
+  // locker paint (from the equipped finish) + its metal shading
+  const paint = cb.frame
+  const paintDarker = shade(paint, -0.5)
+  const metalBody = `${metalFace}, ${paint}`
+  const inkLite = '#E8E2D4'
+  const inkDim = 'rgba(232,226,212,0.5)'
+
   return (
     <div style={{ padding: '6px 16px 22px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '2px 2px 12px' }}>
@@ -59,8 +83,8 @@ export default function Closet({
               onClick={() => onEquipCloset(id)}
               title={CLOSET_SKINS[id].name}
               style={{
-                width: 26, height: 26, borderRadius: 7,
-                background: CLOSET_SKINS[id].board,
+                width: 26, height: 26, borderRadius: 5,
+                background: `${metalFace}, ${CLOSET_SKINS[id].frame}`,
                 cursor: 'pointer',
                 border: equippedCloset === id ? '3px solid #16140F' : '2px solid rgba(22,20,15,0.25)',
                 boxShadow: '1px 1px 0 rgba(0,0,0,0.2)',
@@ -101,25 +125,24 @@ export default function Closet({
         </div>
       )}
 
-      {/* the cabinet */}
+      {/* the metal locker */}
       <div style={{
         position: 'relative',
-        background: `${grainV}, ${cb.frame}`,
-        border: '3px solid #16140F', borderRadius: 14,
-        padding: '0 9px',
-        boxShadow: '0 16px 30px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.22)',
-        overflow: 'hidden',
+        background: metalBody,
+        border: '2px solid #16140F', borderRadius: 8,
+        boxShadow: `0 16px 30px rgba(0,0,0,0.34), 0 6px 0 ${paintDarker}, inset 0 2px 0 rgba(255,255,255,0.24)`,
       }}>
-        {/* crown molding — profiled: lit top lip, shaded underside */}
-        <div style={{ height: 16, margin: '0 -9px', background: `linear-gradient(180deg, rgba(255,255,255,0.32), rgba(255,255,255,0.06) 42%, rgba(0,0,0,0.24)), ${grainH}, ${cb.board}`, borderBottom: '2px solid #16140F', boxShadow: 'inset 0 3px 0 rgba(255,255,255,0.26), 0 5px 8px rgba(0,0,0,0.34)' }} />
+        {/* top vent band with rivets */}
+        <div style={{ position: 'relative', height: 18, borderBottom: '2px solid #16140F', background: `${louver}, ${paint}`, borderRadius: '6px 6px 0 0' }}>
+          <Rivet style={{ top: 5, left: 8 }} />
+          <Rivet style={{ top: 5, right: 8 }} />
+        </div>
 
-        {/* recessed interior — darker toward the side walls for depth */}
-        <div style={{ position: 'relative', margin: '9px 0', background: cb.back, borderRadius: 7, border: '2px solid rgba(0,0,0,0.34)', boxShadow: 'inset 0 12px 18px rgba(0,0,0,0.34), inset 0 -5px 11px rgba(0,0,0,0.22), inset 14px 0 18px rgba(0,0,0,0.16), inset -14px 0 18px rgba(0,0,0,0.16)', overflow: 'hidden' }}>
-          {/* beadboard planks on the back wall */}
-          <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0 1.5px, rgba(255,255,255,0.03) 1.5px 3px, transparent 3px 28px)', pointerEvents: 'none' }} />
-          {/* side posts framing the interior — lit inner edge so they read as rounded uprights */}
-          <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 9, background: `${grainV}, ${cb.frame}`, boxShadow: 'inset -2px 0 0 rgba(255,255,255,0.2), inset 2px 0 0 rgba(0,0,0,0.25), 4px 0 8px rgba(0,0,0,0.36)' }} />
-          <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: 9, background: `${grainV}, ${cb.frame}`, boxShadow: 'inset 2px 0 0 rgba(255,255,255,0.2), inset -2px 0 0 rgba(0,0,0,0.25), -4px 0 8px rgba(0,0,0,0.36)' }} />
+        {/* interior — dark painted steel with metal uprights */}
+        <div style={{ position: 'relative', background: INTERIOR, overflow: 'hidden', boxShadow: 'inset 0 12px 20px rgba(0,0,0,0.55), inset 0 -6px 14px rgba(0,0,0,0.4), inset 16px 0 20px rgba(0,0,0,0.3), inset -16px 0 20px rgba(0,0,0,0.3)' }}>
+          <div style={{ position: 'absolute', inset: 0, background: brushV, pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: 8, background: metalBody, boxShadow: 'inset -2px 0 0 rgba(255,255,255,0.18), 3px 0 8px rgba(0,0,0,0.45)' }} />
+          <div style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: 8, background: metalBody, boxShadow: 'inset 2px 0 0 rgba(255,255,255,0.18), -3px 0 8px rgba(0,0,0,0.45)' }} />
 
           {sections.map(({ shelf, items }) => (
             <div key={shelf.id} style={{ position: 'relative', padding: '9px 13px 0' }}>
@@ -140,10 +163,10 @@ export default function Closet({
                   <button
                     onClick={() => startEdit(shelf)}
                     title="Rename shelf"
-                    style={{ display: 'flex', alignItems: 'center', gap: 5, border: 'none', background: 'transparent', padding: 0, cursor: 'pointer', color: cb.ink }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, border: 'none', background: 'transparent', padding: 0, cursor: 'pointer', color: inkLite }}
                   >
                     <span style={{ fontFamily: 'Anton, sans-serif', fontSize: 13, letterSpacing: '0.04em' }}>{shelf.name}</span>
-                    <span style={{ fontSize: 10, fontWeight: 800, color: cb.inkDim }}>{items.length}</span>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: inkDim }}>{items.length}</span>
                     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.4 }}><path d="M4 20l4.5-1.2L19 8.3l-3.3-3.3L5.2 15.5 4 20z" /></svg>
                   </button>
                 )}
@@ -151,7 +174,7 @@ export default function Closet({
                   <button
                     onClick={() => onRemoveShelf(shelf.id)}
                     title="Remove empty shelf"
-                    style={{ marginLeft: 'auto', border: 'none', background: 'transparent', cursor: 'pointer', color: cb.inkDim, fontSize: 14, lineHeight: 1, padding: '0 2px' }}
+                    style={{ marginLeft: 'auto', border: 'none', background: 'transparent', cursor: 'pointer', color: inkDim, fontSize: 14, lineHeight: 1, padding: '0 2px' }}
                   >
                     ×
                   </button>
@@ -160,7 +183,7 @@ export default function Closet({
 
               <div className="cassd-scroll" style={{ display: 'flex', alignItems: 'flex-end', gap: 5, minHeight: 126, padding: '0 2px 1px', overflowX: 'auto' }}>
                 {items.length === 0 ? (
-                  <div style={{ flex: 1, alignSelf: 'center', textAlign: 'center', fontSize: 11, fontWeight: 700, color: cb.inkDim, padding: '30px 0' }}>
+                  <div style={{ flex: 1, alignSelf: 'center', textAlign: 'center', fontSize: 11, fontWeight: 700, color: inkDim, padding: '30px 0' }}>
                     empty — drag a tape here
                   </div>
                 ) : items.map(t => (
@@ -190,8 +213,8 @@ export default function Closet({
 
               {/* shelf board — 3D plank: lit top surface receding back + grained front edge; click to rename too */}
               <div onClick={() => startEdit(shelf)} style={{ margin: '1px 2px 0', cursor: 'pointer' }}>
-                <div style={{ height: 6, background: `linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.14)), ${grainH}, ${cb.board}`, clipPath: 'polygon(7px 0, calc(100% - 7px) 0, 100% 100%, 0 100%)' }} />
-                <div style={{ height: 13, borderRadius: '0 0 6px 6px', background: `${grainH}, ${cb.board}`, borderTop: '1.5px solid rgba(0,0,0,0.35)', boxShadow: '0 11px 14px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.18), inset 0 -4px 6px rgba(0,0,0,0.46)' }} />
+                <div style={{ height: 5, background: `linear-gradient(180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.14)), ${metalBody}`, clipPath: 'polygon(6px 0, calc(100% - 6px) 0, 100% 100%, 0 100%)' }} />
+                <div style={{ height: 12, borderRadius: '0 0 4px 4px', background: metalBody, borderTop: '1.5px solid rgba(0,0,0,0.42)', boxShadow: '0 10px 13px rgba(0,0,0,0.46), inset 0 2px 0 rgba(255,255,255,0.24), inset 0 -3px 5px rgba(0,0,0,0.42)' }} />
               </div>
             </div>
           ))}
@@ -201,8 +224,8 @@ export default function Closet({
             <button
               onClick={addShelf}
               style={{
-                width: '100%', border: '2px dashed rgba(255,255,255,0.3)', background: 'rgba(0,0,0,0.14)',
-                color: cb.ink, fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.04em',
+                width: '100%', border: '2px dashed rgba(232,226,212,0.28)', background: 'rgba(0,0,0,0.28)',
+                color: inkLite, fontFamily: 'Anton, sans-serif', fontSize: 12, letterSpacing: '0.04em',
                 padding: '9px 0', borderRadius: 9, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               }}
             >
@@ -210,32 +233,47 @@ export default function Closet({
             </button>
           </div>
 
-          {/* cabinet doors — swing open every time you visit the closet */}
-          <div style={{ position: 'absolute', inset: 0, zIndex: 6, pointerEvents: 'none', perspective: 900 }}>
-            {[0, 1].map(side => (
+        </div>
+
+        {/* base vent + rivets */}
+        <div style={{ position: 'relative', height: 16, borderTop: '2px solid #16140F', background: `${louver}, ${paint}`, borderRadius: '0 0 6px 6px' }}>
+          <Rivet style={{ top: 5, left: 8 }} />
+          <Rivet style={{ top: 5, right: 8 }} />
+        </div>
+
+        {/* locker doors — swing open every time you visit the closet (clipped to the locker face) */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 6, pointerEvents: 'none', perspective: 1000, overflow: 'hidden', borderRadius: 8 }}>
+          {[0, 1].map(side => {
+            const inner = side === 0 ? 'right' : 'left'
+            return (
               <div
                 key={side}
                 style={{
                   position: 'absolute', top: 0, bottom: 0,
                   [side === 0 ? 'left' : 'right']: 0, width: '50%',
                   transformOrigin: side === 0 ? 'left center' : 'right center',
-                  animation: `${side === 0 ? 'cassd-door-l' : 'cassd-door-r'} .8s cubic-bezier(.34,.9,.42,1) forwards`,
-                  background: `${grainV}, ${cb.board}`,
-                  border: '2px solid #16140F',
-                  boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.2), 0 6px 14px rgba(0,0,0,0.35)',
+                  animation: `${side === 0 ? 'cassd-door-l' : 'cassd-door-r'} .85s cubic-bezier(.34,.9,.42,1) forwards`,
+                  background: metalBody, border: '2px solid #16140F',
+                  borderRadius: side === 0 ? '6px 0 0 6px' : '0 6px 6px 0',
+                  boxShadow: `${side === 0 ? '6px' : '-6px'} 0 16px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.24)`,
                 } as CSSProperties}
               >
-                {/* inset door panel */}
-                <div style={{ position: 'absolute', inset: '12px 12px 12px 12px', borderRadius: 4, border: '2px solid rgba(0,0,0,0.28)', boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.26), inset 0 -1px 0 rgba(255,255,255,0.16)' }} />
-                {/* knob by the centre seam */}
-                <div style={{ position: 'absolute', [side === 0 ? 'right' : 'left']: 7, top: '50%', width: 9, height: 9, borderRadius: '50%', background: 'radial-gradient(circle at 38% 32%, #4a4034, #16140F)', border: '1.5px solid #16140F', transform: 'translateY(-50%)' } as CSSProperties} />
+                {/* top + bottom vent louvers */}
+                <div style={{ position: 'absolute', top: 14, left: 12, right: 12, height: 20, background: louver, border: '1.5px solid #16140F', borderRadius: 2, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)' }} />
+                <div style={{ position: 'absolute', bottom: 14, left: 12, right: 12, height: 20, background: louver, border: '1.5px solid #16140F', borderRadius: 2, boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)' }} />
+                {/* stamped number plate */}
+                <div style={{ position: 'absolute', top: '42%', left: '50%', transform: 'translateX(-50%)', width: 32, height: 20, borderRadius: 3, background: 'linear-gradient(180deg,#2a2a2a,#0f0f0f)', border: '1.5px solid #16140F', display: 'grid', placeItems: 'center', fontFamily: 'Anton, sans-serif', fontSize: 12, color: '#cfcfcf', letterSpacing: '0.06em' }}>{side === 0 ? '0' : '7'}</div>
+                {/* chrome latch handle near the centre seam */}
+                <div style={{ position: 'absolute', [inner]: 6, top: '50%', transform: 'translateY(-50%)', width: 9, height: 46, borderRadius: 3, background: 'linear-gradient(90deg,#cfcfcf,#6a6a6a 52%,#a4a4a4)', border: '1.5px solid #16140F', boxShadow: '0 2px 3px rgba(0,0,0,0.4)' } as CSSProperties}>
+                  <div style={{ position: 'absolute', [inner === 'right' ? 'left' : 'right']: -5, top: '50%', transform: 'translateY(-50%)', width: 9, height: 16, borderRadius: 3, background: 'linear-gradient(180deg,#d6d6d6,#7a7a7a)', border: '1.5px solid #16140F' } as CSSProperties} />
+                </div>
+                {/* rivets on the hinge edge */}
+                <Rivet style={{ top: 7, [side === 0 ? 'left' : 'right']: 7 } as CSSProperties} />
+                <Rivet style={{ bottom: 7, [side === 0 ? 'left' : 'right']: 7 } as CSSProperties} />
               </div>
-            ))}
-          </div>
+            )
+          })}
         </div>
-
-        {/* plinth / base */}
-        <div style={{ height: 12, margin: '0 -9px', background: `${grainH}, ${cb.board}`, borderTop: '2px solid #16140F', boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.18)' }} />
       </div>
     </div>
   )
