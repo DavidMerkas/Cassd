@@ -4,6 +4,19 @@ Status: **proposals, not decisions.** David picks from this menu; when an item i
 move it into CLAUDE.md §10 as "decided" and build it. Everything here respects the hard
 conventions (zero deps, inline styles, tactile/skeuomorphic feel).
 
+## Direction set by David (2026-07-07)
+
+1. **Goal: revenue + portfolio.** Monetization is real, not hypothetical — build toward
+   §4.1 (Club subscription), but feel/polish still ships first (portfolio value).
+2. **Target: App Store + Play Store.** Plan for a **Capacitor wrapper** (see §5.6).
+   Consequences: digital goods must use **in-app purchases** (Apple mandates IAP,
+   15–30% cut; Stripe not allowed for digital content inside iOS app). Design the
+   subscription around StoreKit/Play Billing from the start, not Stripe.
+   Note: Capacitor is a build/shell dependency — the *app runtime* stays zero-dep;
+   record this exception in CLAUDE.md §3 when the time comes.
+3. **Social: yes, where it makes sense.** Start with zero-backend versions (mixtape in
+   a share URL, share images); full accounts/duo-habits come with the sync backend.
+
 ---
 
 ## North star
@@ -114,12 +127,19 @@ convenience** (cosmetics, sync). Avoid pay-to-win coins.
 3. **Accounts + sync:** the first real backend decision. Smallest viable path:
    lightweight auth + a single JSON blob per user (the `Persisted` object) with
    last-write-wins + version field. Everything social/paid hangs off this.
-4. **Payments:** only after sync exists. Stripe (web) is simplest; app-store wrappers
-   (Capacitor) can come later — note the 15–30% cut and IAP rules if wrapped.
+4. **Payments:** only after sync exists. Store target (decided) means **IAP via
+   StoreKit / Play Billing** through the Capacitor shell — not Stripe — for anything
+   sold inside the app. Web version can keep a Stripe path if it stays separate.
 5. **Share-image renderer:** offscreen `<canvas>` painting the J-card/locker → PNG.
+6. **Capacitor shell (decided direction):** wrap the built Vite app for iOS/Android.
+   Needed for store presence, IAP, native notifications, haptics (nice fit for the
+   tactile feel). Keep it a thin shell: all product code stays plain web / zero-dep.
+   Requires: Apple Developer account ($99/yr), Play Console ($25 once), a Mac with
+   Xcode (David has a MacBook — OK).
 
-Suggested sequence: **1 → 2 → §1.2/§1.3/§1.5 (pure client features) → 5 → 3 → 4.1.**
-Ship feel first, backend second, money last.
+Suggested sequence: **1 (PWA basics) → 2 (sound) → §1.2/§1.3/§1.5 (client features)
+→ 5 (share images) → 6 (Capacitor + store beta) → 3 (accounts/sync) → 4 (IAP Club).**
+Ship feel first, then store presence, then backend, then money.
 
 ---
 
