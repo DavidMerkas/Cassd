@@ -178,6 +178,9 @@ Decided:
 - Nav lives on the boombox; boombox floats over content.
 - Shelves are **user-created** (David organizes manually — no AI guessing where tapes go).
 
+There is also a **ROADMAP.md** in the repo root — an idea bank of proposals (mixtapes,
+tape lengths, sound, stickers, subscription…). Items there are NOT decided; David picks.
+
 Open / requested (not built yet):
 - **Stickers on the locker doors** — David explicitly wants this. The metal doors are the canvas;
   likely earned/bought and stuck on (a sticker layer over the doors, maybe via the shop).
